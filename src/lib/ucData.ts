@@ -1,5 +1,6 @@
 import seasonsRaw from "@/data/seasons.json";
 import playersRaw from "@/data/players.json";
+import erasRaw from "@/data/eras.json";
 
 export type Season = {
   year: number;
@@ -30,8 +31,17 @@ export type PlayerSeason = {
   ast?: number | null;
 };
 
+export type Era = {
+  id: string;
+  label: string;
+  from: number;
+  to: number;
+  group?: string | null;
+};
+
 export const seasons = seasonsRaw as Season[];
 export const playerSeasons = playersRaw as PlayerSeason[];
+export const eras = erasRaw as Era[];
 
 export function coachForYear(year: number): string {
   const s = seasons.find((x) => x.year === year);
