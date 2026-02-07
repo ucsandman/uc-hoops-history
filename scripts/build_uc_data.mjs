@@ -13,6 +13,7 @@
     node scripts/build_uc_data.mjs                 # all available seasons
     node scripts/build_uc_data.mjs --from 1950
     node scripts/build_uc_data.mjs --from 1950 --to 2025
+    node scripts/build_uc_data.mjs --from 1950 --to 1969 --append
 
   Be polite. This is a small scraper.
 */
@@ -247,6 +248,7 @@ async function main() {
   const from = Number(arg("--from", "0"));
   const to = Number(arg("--to", "9999"));
   const indexOnly = process.argv.includes("--index-only");
+  const append = process.argv.includes("--append");
 
   const seasonsAll = await getSeasonIndex();
   if (indexOnly) {
@@ -290,11 +292,39 @@ async function main() {
   const seasonsPath = path.join(root, "src", "data", "seasons.json");
   const playersPath = path.join(root, "src", "data", "players.json");
 
-  await fs.writeFile(seasonsPath, JSON.stringify(seasonsOut, null, 2) + "\n", "utf8");
-  await fs.writeFile(playersPath, JSON.stringify(players, null, 2) + "\n", "utf8");
+  let seasonsFinal = seasonsOut;
+  let playersFinal = players;
 
-  console.log(`Wrote ${seasonsOut.length} seasons → ${seasonsPath}`);
-  console.log(`Wrote ${players.length} player seasons → ${playersPath}`);
+  if (append) {
+    try {
+      const existingSeasons = JSON.parse(await fs.readFile(seasonsPath, "utf8"));
+      if (Array.isArray(existingSeasons)) {
+        const byYear = new Map(existingSeasons.map((s) => [s.year, s]));
+        for (const s of seasonsOut) byYear.set(s.year, s);
+        seasonsFinal = Array.from(byYear.values()).sort((a, b) => a.year - b.year);
+      }
+    } catch {
+      // ignore missing/invalid
+    }
+
+    try {
+      const existingPlayers = JSON.parse(await fs.readFile(playersPath, "utf8"));
+      if (Array.isArray(existingPlayers)) {
+        const key = (r) => `${r.year}|${r.player_url || r.player}`;
+        const byKey = new Map(existingPlayers.map((r) => [key(r), r]));
+        for (const r of players) byKey.set(key(r), r);
+        playersFinal = Array.from(byKey.values()).sort((a, b) => (a.year - b.year) || String(a.player).localeCompare(String(b.player)));
+      }
+    } catch {
+      // ignore missing/invalid
+    }
+  }
+
+  await fs.writeFile(seasonsPath, JSON.stringify(seasonsFinal, null, 2) + "\n", "utf8");
+  await fs.writeFile(playersPath, JSON.stringify(playersFinal, null, 2) + "\n", "utf8");
+
+  console.log(`Wrote ${seasonsFinal.length} seasons → ${seasonsPath}`);
+  console.log(`Wrote ${playersFinal.length} player seasons → ${playersPath}`);
 }
 
 main().catch((e) => {
