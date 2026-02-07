@@ -14,6 +14,17 @@ Build drafts, make them public, then run head-to-head matchups (random opponent 
 - Tailwind CSS
 - Vercel
 
+## Data
+- Sports-Reference (College Basketball) → scraped into static JSON in `src/data/`
+- Data builder script: `npm run build:data`
+  - Supports ranges: `node scripts/build_uc_data.mjs --from 1950 --to 1969 --append`
+  - Use `--append` for chunked builds (recommended to avoid rate limits)
+
+## Eras
+- Era definitions live in `src/data/eras.json`
+- Draft UI reads eras dynamically and groups them by `group` (Coach / Conference / Decade / etc.)
+- Optional helper: `node scripts/generate_eras_from_seasons.mjs` (generates coach spans from `seasons.json`)
+
 ---
 
 ## Key pages
@@ -54,6 +65,16 @@ Build drafts, make them public, then run head-to-head matchups (random opponent 
 ```bash
 npm install
 npm run dev
+```
+
+### Rebuild data
+
+```bash
+# full rebuild (may hit Sports-Reference rate limits)
+npm run build:data
+
+# safer chunked builds
+node scripts/build_uc_data.mjs --from 2010 --to 2025 --append
 ```
 
 Lint/build:
