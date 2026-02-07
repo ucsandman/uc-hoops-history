@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CompeteButton from "@/components/CompeteButton";
 import RenameDraft from "@/components/RenameDraft";
@@ -7,6 +8,26 @@ import type { Lineup, PlayerSnap } from "@/lib/sim";
 import { quickTeamProfile, pct } from "@/lib/teamView";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    await ensureSchema();
+    const pool = db();
+    const res = await pool.query(`SELECT name, mode FROM drafts WHERE id = $1`, [id]);
+    const row = res.rows[0];
+    if (!row) return { title: "Draft • UC Hoops History" };
+
+    const league = row.mode === "sicko" ? "Sicko League" : "Top 5 League";
+    return {
+      title: `${row.name} • ${league}`,
+      description: `UC Hoops History draft: ${row.name}. Run matchups and share the recap.`,
+    };
+  } catch {
+    return { title: "Draft • UC Hoops History" };
+  }
+}
 
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (

@@ -133,6 +133,7 @@ export default function DraftBoard() {
   const [query, setQuery] = useState("");
   const [era, setEra] = useState<string>("all");
   const [mode, setMode] = useState<"top" | "sicko">("top");
+  const [sortBy, setSortBy] = useState<"alpha" | "ppg" | "mpg" | "games">("ppg");
   const [draftName, setDraftName] = useState("");
   const [meUser, setMeUser] = useState<null | { id: string; username: string }>(null);
   const active = mode === "top" ? "top" : "bottom";
@@ -238,8 +239,25 @@ export default function DraftBoard() {
       names = names.filter((n) => fuzzyMatch(n, query));
     }
 
-    return names.sort((a, b) => a.localeCompare(b));
-  }, [played, query, era, posFilter, statsByPlayer]);
+    const val = (name: string) => {
+      const r = statsByPlayer.get(name);
+      return {
+        ppg: r?.pts ?? 0,
+        mpg: r?.minutes ?? 0,
+        games: r?.games ?? 0,
+      };
+    };
+
+    if (sortBy === "alpha") return names.sort((a, b) => a.localeCompare(b));
+
+    const key = sortBy;
+    return names.sort((a, b) => {
+      const av = val(a)[key];
+      const bv = val(b)[key];
+      if (bv !== av) return bv - av;
+      return a.localeCompare(b);
+    });
+  }, [played, query, era, posFilter, statsByPlayer, sortBy]);
 
   /* const statsByPlayer_UNUSED_REMOVED = useMemo(() => {
     const filtered = played.filter((r) => {
@@ -573,7 +591,8 @@ export default function DraftBoard() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Badge>Era filter: {era}</Badge>
+          <Badge>Era: {era === "all" ? "All" : eras.find((e) => e.id === era)?.label ?? era}</Badge>
+          <Badge>Sort: {sortBy.toUpperCase()}</Badge>
           <Badge>Threshold: 10 games + 10 MPG</Badge>
           <Badge>Duplicates blocked</Badge>
         </div>
@@ -756,6 +775,20 @@ export default function DraftBoard() {
                       {er.label}
                     </option>
                   ))}
+                </select>
+
+                <select
+                  value={sortBy}
+                  onChange={(e) => {
+                    setSortBy(e.target.value as typeof sortBy);
+                    setRosterLimit(80);
+                  }}
+                  className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm outline-none focus:border-white/20"
+                >
+                  <option value="ppg">PPG</option>
+                  <option value="mpg">MPG</option>
+                  <option value="games">Games</option>
+                  <option value="alpha">A→Z</option>
                 </select>
               </div>
 
