@@ -34,6 +34,7 @@ Build drafts, make them public, then run head-to-head matchups (random opponent 
 - `/m/[id]` – match recap page
 - `/leaderboard` – rankings
 - `/players` – player list (supports `?era=`)
+- `/compare` – all-time coach comparison
 - `/hall` – quick links / starting points
 
 ---
@@ -57,7 +58,9 @@ Build drafts, make them public, then run head-to-head matchups (random opponent 
 - Share match button
 - **Win probability timeline chart** (scrubbable)
 - NCAA halves clock (1H/2H), OT 5:00
-- "Last possessions" derives from the actual possession timeline (real buzzer tags)
+- "Last possessions" derives from the actual possession timeline
+  - includes buzzer/lead-change tags
+  - adds plausible **player names + actions** (e.g., "Gary Clark offensive rebound, putback made 2")
 
 ---
 
@@ -67,6 +70,11 @@ Build drafts, make them public, then run head-to-head matchups (random opponent 
 npm install
 npm run dev
 ```
+
+## Deploy notes (Vercel)
+- Deployments are done on Vercel.
+- If `vercel --prod` hangs on Windows (seen: socket hang ups during file upload), use the Vercel dashboard to redeploy the latest commit.
+- Avoid running `vercel build` on Windows: it may fail with `EPERM` due to symlink creation in `.vercel/output`.
 
 ### Rebuild data
 
