@@ -14,6 +14,7 @@
     node scripts/build_uc_data.mjs --from 1950
     node scripts/build_uc_data.mjs --from 1950 --to 2025
     node scripts/build_uc_data.mjs --from 1950 --to 1969 --append
+    node scripts/build_uc_data.mjs --from 1901 --to 1949 --append --seasons-only
 
   Be polite. This is a small scraper.
 */
@@ -249,6 +250,7 @@ async function main() {
   const to = Number(arg("--to", "9999"));
   const indexOnly = process.argv.includes("--index-only");
   const append = process.argv.includes("--append");
+  const seasonsOnly = process.argv.includes("--seasons-only");
 
   const seasonsAll = await getSeasonIndex();
   if (indexOnly) {
@@ -273,12 +275,14 @@ async function main() {
 
     console.log(`[${i + 1}/${seasons.length}] Season ${s.year}-${String(yearEnd).slice(-2)} (${yearEnd})`);
 
-    try {
-      const rows = await getPlayersForSeason(yearEnd);
-      players.push(...rows);
-    } catch (e) {
-      console.error(`Failed season ${yearEnd}:`, e);
-      // continue
+    if (!seasonsOnly) {
+      try {
+        const rows = await getPlayersForSeason(yearEnd);
+        players.push(...rows);
+      } catch (e) {
+        console.error(`Failed season ${yearEnd}:`, e);
+        // continue
+      }
     }
 
     // polite delay
