@@ -9,6 +9,22 @@ function randKey() {
   return crypto.getRandomValues(new Uint8Array(16)).reduce((s, b) => s + b.toString(16).padStart(2, "0"), "");
 }
 
+function inferScope(lineup: Lineup): "all" | "since1987" | "last15" {
+  const years = Object.values(lineup)
+    .filter(Boolean)
+    .map((p) => (p as any).year)
+    .filter((y) => typeof y === "number" && Number.isFinite(y)) as number[];
+
+  if (!years.length) return "all";
+
+  const minYear = Math.min(...years);
+  const last15Start = new Date().getFullYear() - 15;
+
+  if (minYear >= last15Start) return "last15";
+  if (minYear >= 1987) return "since1987";
+  return "all";
+}
+
 export async function POST(req: Request) {
   const rl = rateLimit({ key: ipKey(req, "drafts_post"), limit: 30, windowMs: 60_000 });
   if (!rl.ok) {
@@ -26,6 +42,8 @@ export async function POST(req: Request) {
     lineup: Lineup;
     isPublic?: boolean;
   };
+
+  const scope = inferScope(body.lineup);
 
   const userId = await getUserId();
 
@@ -53,11 +71,11 @@ export async function POST(req: Request) {
 
   const res = await pool.query(
     `
-    INSERT INTO drafts (user_id, mode, name, lineup, public, edit_key)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO drafts (user_id, mode, scope, name, lineup, public, edit_key)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING id;
     `,
-    [userId, body.mode, name, body.lineup, body.isPublic ?? true, editKey]
+    [userId, body.mode, scope, name, body.lineup, body.isPublic ?? true, editKey]
   );
 
   const id = res.rows[0].id as string;

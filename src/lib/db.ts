@@ -47,6 +47,7 @@ export async function ensureSchema() {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id UUID NULL REFERENCES users(id) ON DELETE SET NULL,
         mode TEXT NOT NULL CHECK (mode IN ('top','sicko')),
+        scope TEXT NOT NULL DEFAULT 'all' CHECK (scope IN ('all','since1987','last15')),
         name TEXT NOT NULL,
         lineup JSONB NOT NULL,
         public BOOLEAN NOT NULL DEFAULT true,
@@ -56,8 +57,18 @@ export async function ensureSchema() {
       );
     `);
 
+    // Back-compat: if drafts table existed before scope column.
+    await client.query(`ALTER TABLE drafts ADD COLUMN IF NOT EXISTS scope TEXT NOT NULL DEFAULT 'all';`);
+    await client.query(`DO $$ BEGIN
+      ALTER TABLE drafts
+      ADD CONSTRAINT drafts_scope_check
+      CHECK (scope IN ('all','since1987','last15'));
+    EXCEPTION WHEN duplicate_object THEN NULL; END $$;`);
+
     // Common query paths
     await client.query(`CREATE INDEX IF NOT EXISTS drafts_mode_public_updated_idx ON drafts (mode, public, updated_at DESC);`);
+    await client.query(`CREATE INDEX IF NOT EXISTS drafts_scope_idx ON drafts (scope);`);
+    await client.query(`CREATE INDEX IF NOT EXISTS drafts_mode_scope_public_updated_idx ON drafts (mode, scope, public, updated_at DESC);`);
     await client.query(`CREATE INDEX IF NOT EXISTS drafts_user_updated_idx ON drafts (user_id, updated_at DESC);`);
     await client.query(`CREATE INDEX IF NOT EXISTS drafts_mode_updated_idx ON drafts (mode, updated_at DESC);`);
 

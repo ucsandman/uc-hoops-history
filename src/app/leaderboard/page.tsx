@@ -16,11 +16,12 @@ type Row = {
 export default async function LeaderboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ mode?: string; sort?: string }>;
+  searchParams: Promise<{ mode?: string; sort?: string; scope?: string }>;
 }) {
   const sp = await searchParams;
   const mode = sp.mode === "sicko" ? "sicko" : "top";
   const sort = sp.sort === "wins" || sp.sort === "winpct" ? sp.sort : "elo";
+  const scope = sp.scope === "last15" ? "last15" : sp.scope === "since1987" ? "since1987" : "all";
 
   await ensureSchema();
   const pool = db();
@@ -30,11 +31,11 @@ export default async function LeaderboardPage({
     SELECT r.draft_id, r.mode, r.elo, r.wins, r.losses, r.updated_at, d.name
     FROM ratings r
     JOIN drafts d ON d.id = r.draft_id
-    WHERE r.mode = $1
+    WHERE r.mode = $1 AND d.scope = $2
     ORDER BY r.elo DESC
     LIMIT 200;
     `,
-    [mode]
+    [mode, scope]
   );
 
   let rows = res.rows;
@@ -69,7 +70,36 @@ export default async function LeaderboardPage({
 
             <div className="flex flex-wrap items-center gap-2">
               <Link
-                href={`/leaderboard?mode=top&sort=${sort}`}
+                href={`/leaderboard?mode=${mode}&sort=${sort}&scope=all`}
+                className={
+                  "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
+                  (scope === "all" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                }
+              >
+                All-time
+              </Link>
+              <Link
+                href={`/leaderboard?mode=${mode}&sort=${sort}&scope=since1987`}
+                className={
+                  "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
+                  (scope === "since1987" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                }
+              >
+                Since 1987
+              </Link>
+              <Link
+                href={`/leaderboard?mode=${mode}&sort=${sort}&scope=last15`}
+                className={
+                  "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
+                  (scope === "last15" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                }
+              >
+                Last 15 years
+              </Link>
+
+              <span className="mx-1 hidden h-6 w-px bg-white/10 sm:block" />
+              <Link
+                href={`/leaderboard?mode=top&sort=${sort}&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
                   (mode === "top" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
@@ -78,7 +108,7 @@ export default async function LeaderboardPage({
                 Top 5
               </Link>
               <Link
-                href={`/leaderboard?mode=sicko&sort=${sort}`}
+                href={`/leaderboard?mode=sicko&sort=${sort}&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
                   (mode === "sicko" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
@@ -90,7 +120,7 @@ export default async function LeaderboardPage({
               <span className="mx-1 hidden h-6 w-px bg-white/10 sm:block" />
 
               <Link
-                href={`/leaderboard?mode=${mode}&sort=elo`}
+                href={`/leaderboard?mode=${mode}&sort=elo&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm transition-colors " +
                   (sort === "elo" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
@@ -99,7 +129,7 @@ export default async function LeaderboardPage({
                 Elo
               </Link>
               <Link
-                href={`/leaderboard?mode=${mode}&sort=winpct`}
+                href={`/leaderboard?mode=${mode}&sort=winpct&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm transition-colors " +
                   (sort === "winpct" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
@@ -108,7 +138,7 @@ export default async function LeaderboardPage({
                 Win%
               </Link>
               <Link
-                href={`/leaderboard?mode=${mode}&sort=wins`}
+                href={`/leaderboard?mode=${mode}&sort=wins&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm transition-colors " +
                   (sort === "wins" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
