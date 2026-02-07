@@ -855,7 +855,7 @@ export default function DraftBoard() {
                       groups.set(g, arr);
                     }
 
-                    const order = ["Default", "Coach", "Conference", "Decade", "Other"];
+                    const order = ["Default", "Decade", "Conference", "Coach", "Other"];
                     const keys = Array.from(groups.keys()).sort((a, b) => {
                       const ai = order.indexOf(a);
                       const bi = order.indexOf(b);
@@ -863,12 +863,20 @@ export default function DraftBoard() {
                       return a.localeCompare(b);
                     });
 
+                    const sortForGroup = (k: string) => {
+                      // Make the dropdown start with the most recent eras first.
+                      if (k === "Coach" || k === "Conference" || k === "Decade") {
+                        return (a: (typeof eras)[number], b: (typeof eras)[number]) => b.from - a.from;
+                      }
+                      return (a: (typeof eras)[number], b: (typeof eras)[number]) => a.from - b.from;
+                    };
+
                     return keys.map((k) => (
                       <optgroup key={k} label={k}>
                         {groups
                           .get(k)!
                           .slice()
-                          .sort((a, b) => a.from - b.from)
+                          .sort(sortForGroup(k))
                           .map((er) => (
                             <option key={er.id} value={er.id}>
                               {er.label}
