@@ -22,7 +22,7 @@ export default function Home() {
             <Badge>1901 → Now</Badge>
           </div>
 
-          <h1 className="mt-4 text-balance text-3xl font-black tracking-tight sm:text-4xl">
+          <h1 className="mt-4 text-balance text-3xl tracking-tight sm:text-4xl font-black [font-family:var(--font-display)]">
             Pull this up at halftime and start talking trash.
           </h1>
           <p className="mt-3 max-w-2xl text-pretty text-sm text-zinc-300">

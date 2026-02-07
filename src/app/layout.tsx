@@ -1,8 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { Barlow_Condensed, Source_Sans_3 } from "next/font/google";
 import SmartHeader from "@/components/SmartHeader";
 import "./globals.css";
+
+const bodyFont = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "600", "700"],
+});
+
+const displayFont = Barlow_Condensed({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["600", "700", "800"],
+});
 
 export const metadata: Metadata = {
   title: "UC Hoops History",
@@ -20,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className={`${bodyFont.variable} ${displayFont.variable}`}>
         <div className="grain min-h-dvh text-zinc-100">
           <SmartHeader>
             <header className="border-b border-white/10 bg-black/35 backdrop-blur">
@@ -43,10 +56,13 @@ export default function RootLayout({
                     <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10" />
                   </Link>
                   <div>
-                    <Link href="/" className="font-black tracking-tight text-[17px] leading-tight sm:text-[19px]">
+                    <Link
+                      href="/"
+                      className="tracking-tight text-[18px] leading-tight sm:text-[20px] [font-family:var(--font-display)] uppercase"
+                    >
                       UC Hoops History
                     </Link>
-                    <div className="text-[12px] text-zinc-400 sm:text-[13px]">Halftime app for arguing</div>
+                    <div className="text-[12px] text-zinc-400 sm:text-[13px]">Draft, sim, talk trash</div>
                   </div>
                 </div>
 
