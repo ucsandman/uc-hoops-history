@@ -33,7 +33,8 @@ Build drafts, make them public, then run head-to-head matchups (random opponent 
 - `/d/[id]` – draft page (team profile + compete)
 - `/m/[id]` – match recap page
 - `/leaderboard` – rankings
-- `/players` – player list
+- `/players` – player list (supports `?era=`)
+- `/hall` – quick links / starting points
 
 ---
 

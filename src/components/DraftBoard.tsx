@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { eras, filterActuallyPlayed, playerSeasons } from "@/lib/ucData";
 
 type Row = (typeof playerSeasons)[number];
@@ -130,6 +131,9 @@ function fuzzyMatch(name: string, q: string) {
 export default function DraftBoard() {
   const played = useMemo(() => filterActuallyPlayed(playerSeasons, { minGames: 10, minMinutes: 10 }), []);
 
+  const router = useRouter();
+  const sp = useSearchParams();
+
   const [query, setQuery] = useState("");
   const [era, setEra] = useState<string>("all");
   const [mode, setMode] = useState<"top" | "sicko">("top");
@@ -163,6 +167,25 @@ export default function DraftBoard() {
   const shareUrlRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
+    // URL params (shareable)
+    try {
+      const eraQ = sp.get("era");
+      const sortQ = sp.get("sort");
+      if (eraQ && (eraQ === "all" || eras.some((e) => e.id === eraQ))) setEra(eraQ);
+      if (sortQ && ["ppg", "mpg", "games", "alpha"].includes(sortQ)) setSortBy(sortQ as typeof sortBy);
+    } catch {
+      // ignore
+    }
+
+    // Local prefs fallback
+    try {
+      const saved = JSON.parse(localStorage.getItem("uc_draft_controls") ?? "null") as null | { era?: string; sort?: string };
+      if (saved?.era && !sp.get("era") && (saved.era === "all" || eras.some((e) => e.id === saved.era))) setEra(saved.era);
+      if (saved?.sort && !sp.get("sort") && ["ppg", "mpg", "games", "alpha"].includes(saved.sort)) setSortBy(saved.sort as typeof sortBy);
+    } catch {
+      // ignore
+    }
+
     // If we land without a URL-encoded state, prefill the share field with current URL.
     if (shareUrlRef.current) shareUrlRef.current.value = window.location.href;
 
@@ -188,7 +211,26 @@ export default function DraftBoard() {
         if (u?.id && u?.username) setMeUser(u);
       })
       .catch(() => null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Persist controls to URL + localStorage so links are shareable.
+  useEffect(() => {
+    try {
+      localStorage.setItem("uc_draft_controls", JSON.stringify({ era, sort: sortBy }));
+    } catch {
+      // ignore
+    }
+
+    // Keep URL clean: only set params when non-default
+    const url = new URL(window.location.href);
+    if (era && era !== "all") url.searchParams.set("era", era);
+    else url.searchParams.delete("era");
+    if (sortBy && sortBy !== "ppg") url.searchParams.set("sort", sortBy);
+    else url.searchParams.delete("sort");
+
+    router.replace(url.pathname + url.search);
+  }, [era, sortBy, router]);
 
   const statsByPlayer = useMemo(() => {
     const eraObj = eras.find((e) => e.id === era) ?? null;
