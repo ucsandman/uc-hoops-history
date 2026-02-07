@@ -73,7 +73,7 @@ export default async function LeaderboardPage({
                 href={`/leaderboard?mode=${mode}&sort=${sort}&scope=all`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
-                  (scope === "all" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (scope === "all" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 All-time
@@ -82,7 +82,7 @@ export default async function LeaderboardPage({
                 href={`/leaderboard?mode=${mode}&sort=${sort}&scope=since1987`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
-                  (scope === "since1987" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (scope === "since1987" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 Since 1987
@@ -91,7 +91,7 @@ export default async function LeaderboardPage({
                 href={`/leaderboard?mode=${mode}&sort=${sort}&scope=last15`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
-                  (scope === "last15" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (scope === "last15" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 Last 15 years
@@ -102,7 +102,7 @@ export default async function LeaderboardPage({
                 href={`/leaderboard?mode=top&sort=${sort}&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
-                  (mode === "top" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (mode === "top" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 Top 5
@@ -111,7 +111,7 @@ export default async function LeaderboardPage({
                 href={`/leaderboard?mode=sicko&sort=${sort}&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors " +
-                  (mode === "sicko" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (mode === "sicko" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 Sicko
@@ -123,7 +123,7 @@ export default async function LeaderboardPage({
                 href={`/leaderboard?mode=${mode}&sort=elo&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm transition-colors " +
-                  (sort === "elo" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (sort === "elo" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 Elo
@@ -132,7 +132,7 @@ export default async function LeaderboardPage({
                 href={`/leaderboard?mode=${mode}&sort=winpct&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm transition-colors " +
-                  (sort === "winpct" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (sort === "winpct" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 Win%
@@ -141,7 +141,7 @@ export default async function LeaderboardPage({
                 href={`/leaderboard?mode=${mode}&sort=wins&scope=${scope}`}
                 className={
                   "sb-chip rounded-xl px-3 py-1.5 text-sm transition-colors " +
-                  (sort === "wins" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (sort === "wins" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 Wins
