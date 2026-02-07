@@ -50,6 +50,7 @@ export default function WinProbChart({
       <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black/25">
         <svg
           viewBox={`0 0 ${w} ${h}`}
+          preserveAspectRatio="none"
           className="block h-[220px] w-full"
           onMouseMove={(e) => {
             const rect = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
