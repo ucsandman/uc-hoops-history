@@ -56,6 +56,11 @@ export async function ensureSchema() {
       );
     `);
 
+    // Common query paths
+    await client.query(`CREATE INDEX IF NOT EXISTS drafts_mode_public_updated_idx ON drafts (mode, public, updated_at DESC);`);
+    await client.query(`CREATE INDEX IF NOT EXISTS drafts_user_updated_idx ON drafts (user_id, updated_at DESC);`);
+    await client.query(`CREATE INDEX IF NOT EXISTS drafts_mode_updated_idx ON drafts (mode, updated_at DESC);`);
+
     // Back-compat: if drafts table existed before user_id column.
     await client.query(`ALTER TABLE drafts ADD COLUMN IF NOT EXISTS user_id UUID NULL;`);
     await client.query(`DO $$ BEGIN
@@ -75,6 +80,8 @@ export async function ensureSchema() {
       );
     `);
 
+    await client.query(`CREATE INDEX IF NOT EXISTS ratings_mode_elo_idx ON ratings (mode, elo DESC);`);
+
     await client.query(`
       CREATE TABLE IF NOT EXISTS matches (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -88,6 +95,10 @@ export async function ensureSchema() {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
     `);
+
+    await client.query(`CREATE INDEX IF NOT EXISTS matches_mode_created_idx ON matches (mode, created_at DESC);`);
+    await client.query(`CREATE INDEX IF NOT EXISTS matches_draft_a_created_idx ON matches (draft_a, created_at DESC);`);
+    await client.query(`CREATE INDEX IF NOT EXISTS matches_draft_b_created_idx ON matches (draft_b, created_at DESC);`);
 
     schemaReady = true;
   } finally {

@@ -64,6 +64,8 @@ npm run build
 ```
 
 > The app expects environment variables in `.env.local` (database connection, etc.).
+>
+> Quickstart: copy `.env.example` to `.env.local` and fill in `DATABASE_URL`.
 
 ---
 

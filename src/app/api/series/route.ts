@@ -1,19 +1,30 @@
 import { NextResponse } from "next/server";
 import { ensureSchema, db } from "@/lib/db";
+import { rateLimit, ipKey } from "@/lib/rateLimit";
+import { isUuid } from "@/lib/validate";
 import { eloUpdate, simulateMatch, type DraftMode, type DraftSnap } from "@/lib/sim";
 
 export async function POST(req: Request) {
+  // Series can be heavier (n up to 25). Keep this tighter.
+  const rl = rateLimit({ key: ipKey(req, "series"), limit: 6, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Rate limited" },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } }
+    );
+  }
+
   await ensureSchema();
 
   const body = (await req.json()) as {
-    draftA: string;
-    draftB: string;
+    draftA: unknown;
+    draftB: unknown;
     mode: DraftMode;
     n?: number;
     commit?: boolean; // if true, writes matches + updates ratings/elo
   };
 
-  if (!body?.draftA || !body?.draftB) return NextResponse.json({ error: "Missing drafts" }, { status: 400 });
+  if (!isUuid(body?.draftA) || !isUuid(body?.draftB)) return NextResponse.json({ error: "Bad drafts" }, { status: 400 });
   if (body.mode !== "top" && body.mode !== "sicko") return NextResponse.json({ error: "Bad mode" }, { status: 400 });
 
   const n = Math.max(1, Math.min(25, Math.floor(body.n ?? 10)));

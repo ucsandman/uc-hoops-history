@@ -1,12 +1,23 @@
 import { NextResponse } from "next/server";
 import { ensureSchema, db } from "@/lib/db";
+import { rateLimit, ipKey } from "@/lib/rateLimit";
+import { isUuid } from "@/lib/validate";
 import { eloUpdate, simulateMatch, type DraftMode, type DraftSnap } from "@/lib/sim";
 
 export async function POST(req: Request) {
+  // Basic abuse protection (serverless-safe-ish; good enough for v1)
+  const rl = rateLimit({ key: ipKey(req, "match"), limit: 20, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Rate limited" },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } }
+    );
+  }
+
   await ensureSchema();
 
-  const body = (await req.json()) as { draftId: string; mode: DraftMode };
-  if (!body?.draftId) return NextResponse.json({ error: "Missing draftId" }, { status: 400 });
+  const body = (await req.json()) as { draftId: unknown; mode: DraftMode };
+  if (!isUuid(body?.draftId)) return NextResponse.json({ error: "Bad draftId" }, { status: 400 });
   if (body.mode !== "top" && body.mode !== "sicko") return NextResponse.json({ error: "Bad mode" }, { status: 400 });
 
   const pool = db();
