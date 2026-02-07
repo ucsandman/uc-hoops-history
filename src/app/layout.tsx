@@ -86,8 +86,8 @@ export default function RootLayout({
                   <Link className="sb-chip rounded-xl px-3 py-1.5 text-zinc-200 hover:text-white hover:bg-white/5" href="/random">
                     Random 5
                   </Link>
-                  <Link className="sb-chip rounded-xl px-3 py-1.5 text-zinc-200 hover:text-white hover:bg-white/5" href="/hall">
-                    Hall
+                  <Link className="sb-chip rounded-xl px-3 py-1.5 text-zinc-200 hover:text-white hover:bg-white/5" href="/about#quick-picks">
+                    Quick picks
                   </Link>
                   <Link className="sb-chip rounded-xl px-3 py-1.5 text-zinc-200 hover:text-white hover:bg-white/5" href="/about">
                     About
