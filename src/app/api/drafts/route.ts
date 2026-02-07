@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureSchema, db } from "@/lib/db";
+import { rateLimit, ipKey } from "@/lib/rateLimit";
 import { getUserId } from "@/lib/auth";
 import type { DraftMode, Lineup } from "@/lib/sim";
 
@@ -9,6 +10,14 @@ function randKey() {
 }
 
 export async function POST(req: Request) {
+  const rl = rateLimit({ key: ipKey(req, "drafts_post"), limit: 30, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Rate limited" },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } }
+    );
+  }
+
   await ensureSchema();
 
   const body = (await req.json()) as {
