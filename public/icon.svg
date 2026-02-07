@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="BS12 icon">
+  <defs>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff3b30"/>
+      <stop offset="0.55" stop-color="#e00122"/>
+      <stop offset="1" stop-color="#facc15"/>
+    </linearGradient>
+    <radialGradient id="field" cx="22%" cy="10%" r="85%">
+      <stop offset="0" stop-color="#14040a"/>
+      <stop offset="0.55" stop-color="#07070a"/>
+      <stop offset="1" stop-color="#050507"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#e00122" flood-opacity="0.35"/>
+    </filter>
+
+    <!-- Subtle grain -->
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .18 0"/>
+    </filter>
+
+    <clipPath id="clip">
+      <path d="M128 16 C170 16 202 28 222 48 V132 C222 186 186 220 128 244 C70 220 34 186 34 132 V48 C54 28 86 16 128 16Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Shield -->
+  <path filter="url(#shadow)" d="M128 16 C170 16 202 28 222 48 V132 C222 186 186 220 128 244 C70 220 34 186 34 132 V48 C54 28 86 16 128 16Z"
+        fill="url(#field)" stroke="url(#rim)" stroke-width="10" stroke-linejoin="round"/>
+
+  <!-- Court / scoreboard texture -->
+  <g clip-path="url(#clip)" opacity="0.12">
+    <rect x="0" y="0" width="256" height="256" filter="url(#grain)"/>
+  </g>
+
+  <!-- Basketball seams -->
+  <g clip-path="url(#clip)" opacity="0.22" stroke="#ffffff" stroke-width="6" fill="none">
+    <path d="M52 74 C90 42 166 42 204 74"/>
+    <path d="M56 120 C92 102 164 102 200 120"/>
+    <path d="M80 52 C102 76 102 138 80 160"/>
+    <path d="M176 52 C154 76 154 138 176 160"/>
+  </g>
+
+  <!-- Claw marks -->
+  <g clip-path="url(#clip)" opacity="0.95">
+    <path d="M54 188 L112 142" stroke="#ff3b30" stroke-width="12" stroke-linecap="round"/>
+    <path d="M66 208 L126 158" stroke="#e00122" stroke-width="12" stroke-linecap="round"/>
+    <path d="M78 228 L140 176" stroke="#facc15" stroke-width="12" stroke-linecap="round" opacity="0.65"/>
+  </g>
+
+  <!-- BS12 wordmark -->
+  <g filter="url(#glow)" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto" text-anchor="middle">
+    <!-- Backplate -->
+    <path d="M52 170 C64 150 92 134 128 134 C164 134 192 150 204 170 C194 198 166 214 128 214 C90 214 62 198 52 170Z"
+          fill="rgba(0,0,0,0.35)" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+
+    <text x="128" y="186" font-size="78" font-weight="900" letter-spacing="2" fill="#ffffff">BS</text>
+    <text x="128" y="222" font-size="54" font-weight="900" letter-spacing="3" fill="#ffffff" opacity="0.94">12</text>
+
+    <!-- tiny red underline like a scoreboard separator -->
+    <path d="M74 196 H182" stroke="#e00122" stroke-width="8" stroke-linecap="round" opacity="0.88"/>
+  </g>
+</svg>

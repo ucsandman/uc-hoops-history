@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+:root {
+  /* UC-ish palette */
+  --bg0: #07070a;
+  --bg1: #0b0b12;
+  --bg2: #121225;
+  --ink: #f4f4f7;
+  --muted: rgba(244, 244, 247, 0.68);
+
+  --uc-red: #e00122;
+  --uc-red2: #ff3b30;
+  --uc-gold: #facc15;
+
+  --ring: rgba(255, 255, 255, 0.12);
+  --ring2: rgba(255, 255, 255, 0.18);
+}
+
+@theme inline {
+  --color-background: var(--bg0);
+  --color-foreground: var(--ink);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg0);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Clean arena-floor backdrop (subtle grid + vignette). No loud fades. */
+body:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.55;
+  background-image:
+    /* faint grid */
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    /* subtle top vignette */
+    radial-gradient(900px circle at 50% -10%, rgba(255, 255, 255, 0.06), transparent 55%),
+    /* very faint UC red at the bottom edge */
+    radial-gradient(900px circle at 50% 120%, rgba(224, 1, 34, 0.07), transparent 60%);
+  background-size: 64px 64px, 64px 64px, auto, auto;
+}
+
+/* Subtle gritty grain (kept, but quieter) */
+.grain {
+  position: relative;
+}
+.grain:before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.40'/%3E%3C/svg%3E");
+}
+
+/* Cleaner "arena HUD" surfaces */
+.sb-card {
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(10, 10, 14, 0.78);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.sb-chip {
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Native form controls (fix unreadable Windows select dropdowns) */
+html {
+  color-scheme: dark;
+}
+
+select {
+  color: rgba(244, 244, 247, 0.92);
+}
+
+select option {
+  background: #0b0b12;
+  color: rgba(244, 244, 247, 0.95);
+}
