@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { coachForYear, eras, filterByScope, playerSeasons, scopeFromQuery, type Scope } from "@/lib/ucData";
 
 function Badge({ children }: { children: React.ReactNode }) {
@@ -147,7 +148,10 @@ export default function PlayersClient() {
     <div className="space-y-6">
       <header className="space-y-3">
         <div>
-          <h1 className="text-2xl font-black tracking-tight">Players</h1>
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-2xl font-black tracking-tight">Players</h1>
+            <BackButton fallbackHref="/" label="Back" />
+          </div>
           <p className="mt-1 text-sm text-zinc-300 max-w-2xl">Filter by season stats. This is per season, so a player can show up multiple times.</p>
         </div>
 

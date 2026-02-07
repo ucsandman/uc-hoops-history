@@ -1,3 +1,4 @@
+import BackButton from "@/components/BackButton";
 import { filterByScope, playerSeasons, scopeFromQuery, seasons, coachForYear, eraForCoach, filterActuallyPlayed, type Scope } from "@/lib/ucData";
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -139,7 +140,10 @@ export default async function ComparePage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-black tracking-tight">Compare coaches</h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-black tracking-tight">Compare coaches</h1>
+          <BackButton fallbackHref="/" label="Back" />
+        </div>
         <p className="mt-2 text-sm text-zinc-300 max-w-2xl">
           Coach comparison from season-level data. Use the scope toggle to focus on modern eras.
         </p>

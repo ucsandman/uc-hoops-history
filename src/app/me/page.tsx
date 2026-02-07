@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
 import { ensureSchema, db } from "@/lib/db";
 import { getUserId } from "@/lib/auth";
 
@@ -23,7 +24,10 @@ export default async function MePage() {
     return (
       <div className="space-y-6">
         <header className="sb-card rounded-2xl p-6">
-          <div className="text-xs text-zinc-400">Account</div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-xs text-zinc-400">Account</div>
+            <BackButton fallbackHref="/" label="Back" />
+          </div>
           <h1 className="mt-1 text-2xl font-black tracking-tight">Your stuff</h1>
           <p className="mt-2 text-sm text-zinc-300 max-w-2xl">
             Pick a username first so we can save your drafts on this device.
@@ -54,7 +58,10 @@ export default async function MePage() {
   return (
     <div className="space-y-6">
       <header className="sb-card rounded-2xl p-6">
-        <div className="text-xs text-zinc-400">Account</div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="text-xs text-zinc-400">Account</div>
+          <BackButton fallbackHref="/" label="Back" />
+        </div>
         <h1 className="mt-1 text-2xl font-black tracking-tight">My drafts</h1>
         <p className="mt-2 text-sm text-zinc-300 max-w-2xl">
           Drafts saved to this device account.

@@ -4,6 +4,7 @@ import NewOpponentButton from "@/components/NewOpponentButton";
 import SeriesButton from "@/components/SeriesButton";
 import ShareMatchButton from "@/components/ShareMatchButton";
 import WinProbChart from "@/components/WinProbChart";
+import BackButton from "@/components/BackButton";
 import { ensureSchema, db } from "@/lib/db";
 import type { MatchRecap, BoxPlayerLine } from "@/lib/sim";
 import type { Metadata } from "next";
@@ -220,6 +221,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
         <div className="relative">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
+              <BackButton fallbackHref="/" label="Back" className="mr-1" />
               <span className="sb-chip rounded-full px-2 py-0.5 text-[11px] text-zinc-200">
                 {isSicko ? "Sicko League" : "Top 5 League"}
               </span>

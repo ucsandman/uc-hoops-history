@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
 import { ensureSchema, db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -59,7 +60,10 @@ export default async function LeaderboardPage({
         <div className="relative">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <div className="text-xs text-zinc-400">Leaderboard</div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-xs text-zinc-400">Leaderboard</div>
+                <BackButton fallbackHref="/" label="Back" />
+              </div>
               <h1 className="mt-1 text-2xl font-black tracking-tight">
                 {mode === "sicko" ? "Sicko League" : "Top 5 League"}
               </h1>
