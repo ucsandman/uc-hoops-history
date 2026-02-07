@@ -163,7 +163,7 @@ export default function PlayersClient() {
                 onClick={() => setScope(s.id)}
                 className={
                   "sb-chip rounded-xl px-3 py-2 text-xs font-semibold transition-colors " +
-                  (scope === s.id ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (scope === s.id ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 {s.label}

@@ -666,7 +666,7 @@ export default function DraftBoard() {
                 onClick={() => setScope(s.id)}
                 className={
                   "sb-chip rounded-xl px-3 py-2 text-xs font-semibold transition-colors " +
-                  (scope === s.id ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (scope === s.id ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 {s.label}
@@ -684,7 +684,7 @@ export default function DraftBoard() {
                     onClick={() => setMode("top")}
                     className={
                       "rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors " +
-                      (mode === "top" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/10")
+                      (mode === "top" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/10")
                     }
                   >
                     Top 5
@@ -694,7 +694,7 @@ export default function DraftBoard() {
                     onClick={() => setMode("sicko")}
                     className={
                       "rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors " +
-                      (mode === "sicko" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/10")
+                      (mode === "sicko" ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/10")
                     }
                   >
                     Sicko

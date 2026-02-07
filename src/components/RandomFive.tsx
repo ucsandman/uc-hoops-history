@@ -158,7 +158,7 @@ export default function RandomFive() {
                 onClick={() => router.replace(`/random?s=${seed || new Date().getTime()}&scope=${s.id}`)}
                 className={
                   "sb-chip rounded-xl px-3 py-2 text-sm font-semibold transition-colors " +
-                  (scope === s.id ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                  (scope === s.id ? "!bg-white !text-black" : "text-zinc-200 hover:bg-white/5")
                 }
               >
                 {s.label}
