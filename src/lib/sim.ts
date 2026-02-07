@@ -719,26 +719,69 @@ function lastPossessionsFromLog(opts: { log: PossLog[]; aBox: BoxPlayerLine[]; b
     let desc = raw;
     const who = actorFromBox(box, isTO ? "turnover" : isOREB ? "oreb" : "shot", opts.rand);
 
+    const pick = <T,>(arr: T[]) => arr[Math.floor(opts.rand() * arr.length)]!;
+
+    const funny = {
+      made2: [
+        (p: string) => `${p} gets downhill and finishes for 2`,
+        (p: string) => `${p} hits a layup like it is 2002 again`,
+        (p: string) => `${p} buckets a tough 2 and stares at nobody in particular`,
+      ],
+      miss2: [
+        (p: string) => `${p} misses a 2, rims out in slow motion`,
+        (p: string) => `${p} smokes a layup and immediately looks for a foul`,
+        (p: string) => `${p} bricks a 2 and pretends it was a pass`,
+      ],
+      made3: [
+        (p: string) => `${p} splashes a 3 and the crowd starts typing`,
+        (p: string) => `${p} hits a 3, absolutely disrespectful`,
+        (p: string) => `${p} drills a 3 and suddenly everyone believes`,
+      ],
+      miss3: [
+        (p: string) => `${p} misses a 3, heat check without the heat`,
+        (p: string) => `${p} launches a 3 and it files a missing persons report`,
+        (p: string) => `${p} bricks a 3, vibes only`,
+      ],
+      turnover: [
+        (p: string) => `${p} turns it over, ball security left the chat`,
+        (p: string) => `${p} coughs it up, tragic`,
+        (p: string) => `${p} commits a turnover and points at someone else`,
+      ],
+      orebPutbackMake: [
+        (p: string) => `${p} snags the offensive board and powers in a putback for 2`,
+        (p: string) => `${p} cleans the glass and gets the putback. Effort points`,
+      ],
+      orebPutbackMiss: [
+        (p: string) => `${p} grabs the offensive board then misses the putback. Pain`,
+        (p: string) => `${p} offensive rebound, putback misses. Second chance wasted`,
+      ],
+      orebKickoutMake: [
+        (r: string, s: string) => `${r} offensive board, kicks out. ${s} cashes a 3`,
+        (r: string, s: string) => `${r} keeps it alive, kickout to ${s}. Bang. 3`,
+      ],
+      orebKickoutMiss: [
+        (r: string, s: string) => `${r} offensive board, kickout to ${s}. Missed 3`,
+        (r: string, s: string) => `${r} rebounds it, ${s} fires. Brick. Missed 3`,
+      ],
+    };
+
     if (isOREB) {
       const rebounder = who;
       const shooter = opts.rand() < 0.65 ? rebounder : actorFromBox(box, "shot", opts.rand);
 
-      // Try to translate SR-ish text into something that reads like a call.
-      // Examples raw: "OREB → made 2", "OREB → miss 3"
       const tail = raw.replace(/.*OREB\s*→\s*/i, "");
-      if (/made\s+2/i.test(tail)) desc = `${rebounder} offensive rebound, putback made 2`;
-      else if (/miss\s+2/i.test(tail)) desc = `${rebounder} offensive rebound, putback missed 2`;
-      else if (/made\s+3/i.test(tail)) desc = `${rebounder} offensive rebound, kickout — ${shooter} made 3`;
-      else if (/miss\s+3/i.test(tail)) desc = `${rebounder} offensive rebound, kickout — ${shooter} missed 3`;
+      if (/made\s+2/i.test(tail)) desc = pick(funny.orebPutbackMake)(rebounder);
+      else if (/miss\s+2/i.test(tail)) desc = pick(funny.orebPutbackMiss)(rebounder);
+      else if (/made\s+3/i.test(tail)) desc = pick(funny.orebKickoutMake)(rebounder, shooter);
+      else if (/miss\s+3/i.test(tail)) desc = pick(funny.orebKickoutMiss)(rebounder, shooter);
       else desc = `${rebounder} offensive rebound — ${tail}`;
     } else if (isTO) {
-      desc = `${who} turnover`;
+      desc = pick(funny.turnover)(who);
     } else {
-      // made/miss 2/3
-      if (/made\s+2/i.test(raw)) desc = `${who} made 2`;
-      else if (/made\s+3/i.test(raw)) desc = `${who} made 3`;
-      else if (/miss\s+2/i.test(raw)) desc = `${who} missed 2`;
-      else if (/miss\s+3/i.test(raw)) desc = `${who} missed 3`;
+      if (/made\s+2/i.test(raw)) desc = pick(funny.made2)(who);
+      else if (/made\s+3/i.test(raw)) desc = pick(funny.made3)(who);
+      else if (/miss\s+2/i.test(raw)) desc = pick(funny.miss2)(who);
+      else if (/miss\s+3/i.test(raw)) desc = pick(funny.miss3)(who);
       else desc = `${who} ${raw}`;
     }
 
