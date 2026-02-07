@@ -770,11 +770,37 @@ export default function DraftBoard() {
                   className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm outline-none focus:border-white/20"
                 >
                   <option value="all">All</option>
-                  {eras.map((er) => (
-                    <option key={er.id} value={er.id}>
-                      {er.label}
-                    </option>
-                  ))}
+                  {(() => {
+                    const groups = new Map<string, typeof eras>();
+                    for (const er of eras) {
+                      const g = er.group ?? "Other";
+                      const arr = groups.get(g) ?? [];
+                      arr.push(er);
+                      groups.set(g, arr);
+                    }
+
+                    const order = ["Default", "Coach", "Conference", "Decade", "Other"];
+                    const keys = Array.from(groups.keys()).sort((a, b) => {
+                      const ai = order.indexOf(a);
+                      const bi = order.indexOf(b);
+                      if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+                      return a.localeCompare(b);
+                    });
+
+                    return keys.map((k) => (
+                      <optgroup key={k} label={k}>
+                        {groups
+                          .get(k)!
+                          .slice()
+                          .sort((a, b) => a.from - b.from)
+                          .map((er) => (
+                            <option key={er.id} value={er.id}>
+                              {er.label}
+                            </option>
+                          ))}
+                      </optgroup>
+                    ));
+                  })()}
                 </select>
 
                 <select
