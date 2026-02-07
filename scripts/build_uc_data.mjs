@@ -54,15 +54,46 @@ function absUrl(href) {
   return `https://www.sports-reference.com${href}`;
 }
 
-async function fetchHtml(url) {
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "uc-hoops-history/0.1 (data builder; personal fan project)",
-      "Accept": "text/html,application/xhtml+xml",
-    },
-  });
-  if (!res.ok) throw new Error(`Fetch failed ${res.status} for ${url}`);
-  return await res.text();
+async function fetchHtml(url, opts = { tries: 6 }) {
+  let wait = 650;
+  for (let i = 0; i < opts.tries; i++) {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 20_000);
+
+    let res;
+    try {
+      res = await fetch(url, {
+        headers: {
+          "User-Agent": "uc-hoops-history/0.1 (data builder; personal fan project)",
+          "Accept": "text/html,application/xhtml+xml",
+        },
+        signal: controller.signal,
+      });
+    } catch (e) {
+      clearTimeout(t);
+      await sleep(wait);
+      wait = Math.min(wait * 1.6, 10_000);
+      continue;
+    } finally {
+      clearTimeout(t);
+    }
+
+    if (res.ok) return await res.text();
+
+    // Basic backoff for rate limiting / transient errors.
+    if (res.status === 429 || res.status >= 500) {
+      const retryAfter = res.headers.get("retry-after");
+      const raMs = retryAfter ? Number(retryAfter) * 1000 : NaN;
+      const sleepMs = Number.isFinite(raMs) ? Math.max(raMs, wait) : wait;
+      await sleep(sleepMs);
+      wait = Math.min(wait * 1.6, 10_000);
+      continue;
+    }
+
+    throw new Error(`Fetch failed ${res.status} for ${url}`);
+  }
+
+  throw new Error(`Fetch failed after retries for ${url}`);
 }
 
 function extractTable(html, id) {
@@ -249,7 +280,7 @@ async function main() {
     }
 
     // polite delay
-    await sleep(350);
+    await sleep(900);
   }
 
   // Remove helper field

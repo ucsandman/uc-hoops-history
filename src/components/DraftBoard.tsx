@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { coachForYear, eraForCoach, filterActuallyPlayed, playerSeasons } from "@/lib/ucData";
+import { eras, filterActuallyPlayed, playerSeasons } from "@/lib/ucData";
 
 type Row = (typeof playerSeasons)[number];
 
@@ -131,7 +131,7 @@ export default function DraftBoard() {
   const played = useMemo(() => filterActuallyPlayed(playerSeasons, { minGames: 10, minMinutes: 10 }), []);
 
   const [query, setQuery] = useState("");
-  const [era, setEra] = useState<"All" | "Cronin" | "Brannen" | "Miller">("All");
+  const [era, setEra] = useState<string>("all");
   const [mode, setMode] = useState<"top" | "sicko">("top");
   const [draftName, setDraftName] = useState("");
   const [meUser, setMeUser] = useState<null | { id: string; username: string }>(null);
@@ -190,11 +190,11 @@ export default function DraftBoard() {
   }, []);
 
   const statsByPlayer = useMemo(() => {
+    const eraObj = eras.find((e) => e.id === era) ?? null;
     const filtered = played.filter((r) => {
-      const coach = coachForYear(r.year);
-      const e = eraForCoach(coach);
-      if (era === "All") return true;
-      return e === era;
+      if (era === "all") return true;
+      if (!eraObj) return true;
+      return r.year >= eraObj.from && r.year <= eraObj.to;
     });
 
     const map = new Map<string, Row[]>();
@@ -213,11 +213,11 @@ export default function DraftBoard() {
   }, [played, era]);
 
   const roster = useMemo(() => {
+    const eraObj = eras.find((e) => e.id === era) ?? null;
     const filtered = played.filter((r) => {
-      const coach = coachForYear(r.year);
-      const e = eraForCoach(coach);
-      if (era === "All") return true;
-      return e === era;
+      if (era === "all") return true;
+      if (!eraObj) return true;
+      return r.year >= eraObj.from && r.year <= eraObj.to;
     });
 
     // collapse to unique player names
@@ -745,15 +745,17 @@ export default function DraftBoard() {
                 <select
                   value={era}
                   onChange={(e) => {
-                    setEra(e.target.value as "All" | "Cronin" | "Brannen" | "Miller");
+                    setEra(e.target.value);
                     setRosterLimit(80);
                   }}
                   className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm outline-none focus:border-white/20"
                 >
-                  <option>All</option>
-                  <option>Cronin</option>
-                  <option>Brannen</option>
-                  <option>Miller</option>
+                  <option value="all">All</option>
+                  {eras.map((er) => (
+                    <option key={er.id} value={er.id}>
+                      {er.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
