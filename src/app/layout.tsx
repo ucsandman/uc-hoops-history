@@ -5,9 +5,8 @@ import SmartHeader from "@/components/SmartHeader";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Bearcats Since 2012",
-  description:
-    "UC Men’s Basketball since 2012 — seasons, players, runs, and draft-board debates.",
+  title: "UC Hoops History",
+  description: "UC Men’s Basketball history — seasons, players, drafts, and matchup recaps.",
   icons: {
     icon: "/icon.png",
     apple: "/apple-icon.png",
@@ -34,7 +33,7 @@ export default function RootLayout({
                   >
                     <Image
                       src="/icon.png"
-                      alt="Bearcats Since 2012"
+                      alt="UC Hoops History"
                       fill
                       sizes="56px"
                       className="object-cover"
@@ -45,7 +44,7 @@ export default function RootLayout({
                   </Link>
                   <div>
                     <Link href="/" className="font-black tracking-tight text-[17px] leading-tight sm:text-[19px]">
-                      Bearcats Since 2012
+                      UC Hoops History
                     </Link>
                     <div className="text-[12px] text-zinc-400 sm:text-[13px]">Halftime app for arguing</div>
                   </div>

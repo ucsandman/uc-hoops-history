@@ -19,7 +19,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-2">
             <Badge>UC Men’s Basketball</Badge>
             <Badge>Halftime Mode</Badge>
-            <Badge>2012 → Now</Badge>
+            <Badge>1901 → Now</Badge>
           </div>
 
           <h1 className="mt-4 text-balance text-3xl font-black tracking-tight sm:text-4xl">
