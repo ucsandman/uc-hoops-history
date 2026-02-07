@@ -86,10 +86,10 @@ function TopBottom({ era }: { era: "Cronin" | "Brannen" | "Miller" }) {
 }
 
 export default function ComparePage() {
-  const seasons2012 = seasons.filter((s) => s.year >= 2012);
+  const seasonsAll = [...seasons].sort((a, b) => a.year - b.year);
 
-  const byCoach = new Map<string, typeof seasons2012>();
-  for (const s of seasons2012) {
+  const byCoach = new Map<string, typeof seasonsAll>();
+  for (const s of seasonsAll) {
     const coach = coachForYear(s.year);
     const arr = byCoach.get(coach) ?? [];
     arr.push(s);
@@ -108,9 +108,13 @@ export default function ComparePage() {
     const ncaaApps = ss.filter((x) => (x.postseason ?? "").includes("NCAA")).length;
     const best = [...ss].sort((a, b) => pct(b.wins, b.losses) - pct(a.wins, a.losses))[0];
 
+    const from = Math.min(...ss.map((x) => x.year));
+    const to = Math.max(...ss.map((x) => x.year));
+
     return {
       coach,
-      era: eraForCoach(coach),
+      from,
+      to,
       seasons: ss.length,
       w,
       l,
@@ -128,17 +132,17 @@ export default function ComparePage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-black tracking-tight">Compare coaches (2012+)</h1>
+        <h1 className="text-2xl font-black tracking-tight">Compare coaches (all-time)</h1>
         <p className="mt-2 text-sm text-zinc-300 max-w-2xl">
-          Quick-and-dirty coach comparison from season-level data. We can add deeper stats (efficiency,
-          player development, etc.) later.
+          Coach comparison from season-level data across our full dataset. This is still quick-and-dirty,
+          but it now includes every coach we have seasons for.
         </p>
       </header>
 
       <section className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <Stat label="Seasons tracked" value={String(seasons2012.length)} />
+        <Stat label="Seasons tracked" value={String(seasonsAll.length)} />
         <Stat label="Players tracked" value={String(new Set(playerSeasons.map((p) => p.player)).size)} />
-        <Stat label="Data window" value="2012 → now" />
+        <Stat label="Data window" value={`${seasonsAll[0]?.year ?? "—"} → ${seasonsAll.at(-1)?.year ?? "—"}`} />
       </section>
 
       <section className="grid grid-cols-1 gap-3">
@@ -148,7 +152,7 @@ export default function ComparePage() {
               <div>
                 <div className="text-xs text-zinc-400">Coach</div>
                 <div className="text-xl font-black tracking-tight">{c.coach}</div>
-                <div className="mt-1 text-sm text-zinc-300">Era: {c.era}</div>
+                <div className="mt-1 text-sm text-zinc-300">Tenure: {c.from}–{c.to}</div>
               </div>
               <div className="text-right">
                 <div className="text-xs text-zinc-400">Overall</div>
