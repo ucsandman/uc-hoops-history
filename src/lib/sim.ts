@@ -100,7 +100,17 @@ export type MatchRecap = {
     line: BoxPlayerLine;
     blurb: string;
   };
-  lastPossessions: Array<{ t: string; text: string }>;
+  lastPossessions: Array<{
+    t: string;
+    side: "A" | "B" | "N";
+    player: string;
+    desc: string;
+    a: number;
+    b: number;
+    buzzer?: boolean;
+    leadChange?: boolean;
+    text: string; // preformatted fallback
+  }>;
   playByPlay?: Array<{ t: string; text: string; a: number; b: number }>;
   winProbTimeline?: Array<{ t: string; a: number; b: number; wpA: number }>;
 };
@@ -723,45 +733,54 @@ function lastPossessionsFromLog(opts: { log: PossLog[]; aBox: BoxPlayerLine[]; b
 
     const funny = {
       made2: [
-        (p: string) => `${p} gets downhill and finishes for 2`,
-        (p: string) => `${p} hits a layup like it is 2002 again`,
-        (p: string) => `${p} buckets a tough 2 and stares at nobody in particular`,
+        (p: string) => `${p} bullies their way to 2. Group chat instantly says “too small”`,
+        (p: string) => `${p} gets a layup and looks around like they just solved world hunger`,
+        (p: string) => `${p} hits a tough 2 and everyone argues if it was skill or luck`,
+        (p: string) => `${p} scores 2 and somebody yells “AND ONE” from their couch`,
       ],
       miss2: [
-        (p: string) => `${p} misses a 2, rims out in slow motion`,
-        (p: string) => `${p} smokes a layup and immediately looks for a foul`,
-        (p: string) => `${p} bricks a 2 and pretends it was a pass`,
+        (p: string) => `${p} misses a 2. The rim said “not today king”`,
+        (p: string) => `${p} smokes a layup and immediately starts the ref discourse`,
+        (p: string) => `${p} bricks a 2 and points like it was a set play`,
+        (p: string) => `${p} misses at the rim. Silence. Then one friend types “lol”`,
       ],
       made3: [
-        (p: string) => `${p} splashes a 3 and the crowd starts typing`,
-        (p: string) => `${p} hits a 3, absolutely disrespectful`,
-        (p: string) => `${p} drills a 3 and suddenly everyone believes`,
+        (p: string) => `${p} splashes a 3. Three people type “BANG” at once`,
+        (p: string) => `${p} hits a 3 and does the invisible headband tap. Iconic`,
+        (p: string) => `${p} drills a 3. Somebody screenshots the scoreboard like evidence`,
+        (p: string) => `${p} cashes a 3 and suddenly the hot takes get confident`,
       ],
       miss3: [
-        (p: string) => `${p} misses a 3, heat check without the heat`,
-        (p: string) => `${p} launches a 3 and it files a missing persons report`,
-        (p: string) => `${p} bricks a 3, vibes only`,
+        (p: string) => `${p} misses a 3. That was a “I can’t believe I shot that” shot`,
+        (p: string) => `${p} launches a 3 and it lands in a different zip code`,
+        (p: string) => `${p} bricks a 3. Pure vibes. Zero math`,
+        (p: string) => `${p} misses a 3 and somebody says “good shot” in the most disrespectful way`,
       ],
       turnover: [
-        (p: string) => `${p} turns it over, ball security left the chat`,
-        (p: string) => `${p} coughs it up, tragic`,
-        (p: string) => `${p} commits a turnover and points at someone else`,
+        (p: string) => `${p} turns it over. Ball security has left the group chat`,
+        (p: string) => `${p} coughs it up and immediately does the “my bad” clap`,
+        (p: string) => `${p} commits a turnover and points at someone else. Classic`,
+        (p: string) => `${p} turns it over. The chat starts posting trade proposals`,
       ],
       orebPutbackMake: [
-        (p: string) => `${p} snags the offensive board and powers in a putback for 2`,
-        (p: string) => `${p} cleans the glass and gets the putback. Effort points`,
+        (p: string) => `${p} snags the OREB and sticks the putback. Effort merchant points`,
+        (p: string) => `${p} cleans the glass and gets the putback. Second chance, first class`,
+        (p: string) => `${p} offensive board then putback. The hustle tweets write themselves`,
       ],
       orebPutbackMiss: [
-        (p: string) => `${p} grabs the offensive board then misses the putback. Pain`,
-        (p: string) => `${p} offensive rebound, putback misses. Second chance wasted`,
+        (p: string) => `${p} grabs the OREB then misses the putback. Pain with a capital P`,
+        (p: string) => `${p} gets the OREB, misses again. Double the effort, double the sadness`,
+        (p: string) => `${p} offensive rebound… and still no points. Generational cardio`,
       ],
       orebKickoutMake: [
-        (r: string, s: string) => `${r} offensive board, kicks out. ${s} cashes a 3`,
-        (r: string, s: string) => `${r} keeps it alive, kickout to ${s}. Bang. 3`,
+        (r: string, s: string) => `${r} keeps it alive, kicks out. ${s} cashes the 3. Chat goes feral`,
+        (r: string, s: string) => `${r} offensive board, kickout to ${s}. Splash. Somebody yells “RUN IT BACK”`,
+        (r: string, s: string) => `${r} taps it out, ${s} shoots. Money. Everybody becomes an analyst`,
       ],
       orebKickoutMiss: [
-        (r: string, s: string) => `${r} offensive board, kickout to ${s}. Missed 3`,
-        (r: string, s: string) => `${r} rebounds it, ${s} fires. Brick. Missed 3`,
+        (r: string, s: string) => `${r} offensive board, kickout to ${s}. Miss. Whole possession was a prank`,
+        (r: string, s: string) => `${r} rebounds it, ${s} fires. Brick. The chat starts typing in all caps`,
+        (r: string, s: string) => `${r} keeps it alive, ${s} clanks the 3. That is sicko behavior`,
       ],
     };
 
@@ -786,10 +805,15 @@ function lastPossessionsFromLog(opts: { log: PossLog[]; aBox: BoxPlayerLine[]; b
     }
 
     // Preserve buzzer/lead-change tags
-    if (raw.includes("(BUZZER)")) desc += " (BUZZER)";
-    if (raw.includes("(lead change)")) desc += " (lead change)";
+    const buzzer = raw.includes("(BUZZER)");
+    const leadChange = raw.includes("(lead change)");
 
-    return { t: x.t, text: `${x.side}: ${desc} (${x.a}-${x.b})` };
+    if (buzzer) desc += " (BUZZER)";
+    if (leadChange) desc += " (lead change)";
+
+    const text = `${x.side}: ${desc} (${x.a}-${x.b})`;
+
+    return { t: x.t, side: x.side, player: who, desc, a: x.a, b: x.b, buzzer, leadChange, text };
   });
 }
 
@@ -1087,7 +1111,7 @@ export function simulateMatch(opts: {
   let bBox = buildBox(opts.b.lineup, bScore, rand);
 
   let overtime: MatchRecap["overtime"] | undefined;
-  let lp = lastPossessionsFromLog({ log: sim.log, aBox, bBox, rand });
+  let lp: MatchRecap["lastPossessions"] = lastPossessionsFromLog({ log: sim.log, aBox, bBox, rand });
 
   const debug: NonNullable<MatchRecap["debug"]> = {
     pace,
@@ -1187,11 +1211,42 @@ export function simulateMatch(opts: {
     debug.notes.push("OT: we simulate extra possessions (not a coin flip) until there's a winner.");
 
     // OT story beats
-    const otLines = [
-      { t: "OT", text: overtime.headline },
-      { t: "2:11", text: "Somebody hits a shot that ruins friendships." },
-      { t: "0:00", text: "Overtime ends. Everyone immediately requests a rematch." },
+    const otLines: MatchRecap["lastPossessions"] = [
+      {
+        t: "OT",
+        side: "N",
+        player: "Overtime",
+        desc: overtime.headline,
+        a: aScore,
+        b: bScore,
+        text: overtime.headline,
+        buzzer: false,
+        leadChange: false,
+      },
+      {
+        t: "2:11",
+        side: "N",
+        player: "Narrator",
+        desc: "Somebody hits a shot that ruins friendships.",
+        a: aScore,
+        b: bScore,
+        text: "Somebody hits a shot that ruins friendships.",
+        buzzer: false,
+        leadChange: false,
+      },
+      {
+        t: "0:00",
+        side: "N",
+        player: "Narrator",
+        desc: "Overtime ends. Everyone immediately requests a rematch.",
+        a: aScore,
+        b: bScore,
+        text: "Overtime ends. Everyone immediately requests a rematch.",
+        buzzer: false,
+        leadChange: false,
+      },
     ];
+
     lp = [...lp, ...otLines];
   }
 
@@ -1232,9 +1287,6 @@ export function simulateMatch(opts: {
   const pog = playerOfGame(recapBase, rand);
 
   const playByPlay = sim.log.map((x) => ({ t: x.t, text: x.text, a: x.a, b: x.b }));
-
-  // Last possessions = literal last 10 entries from the actual timeline.
-  lp = playByPlay.slice(-10).map((x) => ({ t: x.t, text: `${x.text} (${x.a}-${x.b})` }));
 
   return {
     ...recapBase,

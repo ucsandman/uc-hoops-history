@@ -476,15 +476,33 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
         <section className="sb-card rounded-2xl p-5">
           <h2 className="text-lg font-black tracking-tight">Last possessions</h2>
           <div className="mt-3 space-y-2">
-            {recap.lastPossessions.map((x, i) => (
-              <div
-                key={i}
-                className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2"
-              >
-                <div className="w-12 shrink-0 pt-0.5 text-[11px] text-zinc-500">{x.t}</div>
-                <div className="flex-1 text-sm text-zinc-200">{x.text}</div>
-              </div>
-            ))}
+            {recap.lastPossessions.map((x, i) => {
+              const desc = x.desc?.startsWith(x.player)
+                ? x.desc.slice(x.player.length).replace(/^\s*[—-]?\s*/, "")
+                : x.desc ?? x.text;
+
+              return (
+                <div
+                  key={i}
+                  className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2"
+                >
+                  <div className="w-12 shrink-0 pt-0.5 text-[11px] text-zinc-500">{x.t}</div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm text-zinc-200">
+                      <span className="font-black text-zinc-100">{x.player}</span>
+                      <span className="text-zinc-500"> — </span>
+                      <span className="text-zinc-200">{desc}</span>
+                    </div>
+                    <div className="mt-0.5 text-[11px] text-zinc-500">
+                      {x.side} • {x.a}-{x.b}
+                      {x.buzzer ? " • BUZZER" : ""}
+                      {x.leadChange ? " • lead change" : ""}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       </div>
