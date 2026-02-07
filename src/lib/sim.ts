@@ -667,10 +667,90 @@ function playerOfGame(recap: Pick<MatchRecap, "a" | "b" | "winnerId">, rand: () 
   };
 }
 
+/*
 function pickFrom<T>(arr: T[], rand: () => number): T {
   return arr[Math.floor(rand() * arr.length)]!;
 }
+*/
 
+function pickWeighted<T>(items: T[], w: (t: T) => number, rand: () => number): T {
+  const weights = items.map((x) => Math.max(0, w(x)));
+  const sum = weights.reduce((a, b) => a + b, 0) || 1;
+  let r = rand() * sum;
+  for (let i = 0; i < items.length; i++) {
+    r -= weights[i]!;
+    if (r <= 0) return items[i]!;
+  }
+  return items[items.length - 1]!;
+}
+
+function actorFromBox(box: BoxPlayerLine[], kind: "shot" | "oreb" | "turnover", rand: () => number) {
+  if (!box.length) return "Someone";
+
+  if (kind === "oreb") {
+    // Bias bigs and good rebounders.
+    return pickWeighted(
+      box,
+      (l) => (l.reb + 1) * (l.slot === "C" || l.slot === "PF" ? 1.3 : 1.0),
+      rand
+    ).player;
+  }
+
+  if (kind === "turnover") {
+    // Ballhandlers commit more TOs.
+    return pickWeighted(box, (l) => (l.tov + 1) * (l.slot === "PG" || l.slot === "SG" ? 1.25 : 1.0), rand).player;
+  }
+
+  // shot
+  return pickWeighted(box, (l) => l.pts + 1, rand).player;
+}
+
+function lastPossessionsFromLog(opts: { log: PossLog[]; aBox: BoxPlayerLine[]; bBox: BoxPlayerLine[]; rand: () => number }) {
+  const last = opts.log.slice(-10);
+  return last.map((x) => {
+    const box = x.side === "A" ? opts.aBox : opts.bBox;
+
+    // Strip the "A: " / "B: " prefix if present.
+    const raw = x.text.replace(/^A:\s*/i, "").replace(/^B:\s*/i, "");
+
+    const isOREB = raw.toUpperCase().includes("OREB");
+    const isTO = raw.toLowerCase().includes("turnover");
+
+    let desc = raw;
+    const who = actorFromBox(box, isTO ? "turnover" : isOREB ? "oreb" : "shot", opts.rand);
+
+    if (isOREB) {
+      const rebounder = who;
+      const shooter = opts.rand() < 0.65 ? rebounder : actorFromBox(box, "shot", opts.rand);
+
+      // Try to translate SR-ish text into something that reads like a call.
+      // Examples raw: "OREB → made 2", "OREB → miss 3"
+      const tail = raw.replace(/.*OREB\s*→\s*/i, "");
+      if (/made\s+2/i.test(tail)) desc = `${rebounder} offensive rebound, putback made 2`;
+      else if (/miss\s+2/i.test(tail)) desc = `${rebounder} offensive rebound, putback missed 2`;
+      else if (/made\s+3/i.test(tail)) desc = `${rebounder} offensive rebound, kickout — ${shooter} made 3`;
+      else if (/miss\s+3/i.test(tail)) desc = `${rebounder} offensive rebound, kickout — ${shooter} missed 3`;
+      else desc = `${rebounder} offensive rebound — ${tail}`;
+    } else if (isTO) {
+      desc = `${who} turnover`;
+    } else {
+      // made/miss 2/3
+      if (/made\s+2/i.test(raw)) desc = `${who} made 2`;
+      else if (/made\s+3/i.test(raw)) desc = `${who} made 3`;
+      else if (/miss\s+2/i.test(raw)) desc = `${who} missed 2`;
+      else if (/miss\s+3/i.test(raw)) desc = `${who} missed 3`;
+      else desc = `${who} ${raw}`;
+    }
+
+    // Preserve buzzer/lead-change tags
+    if (raw.includes("(BUZZER)")) desc += " (BUZZER)";
+    if (raw.includes("(lead change)")) desc += " (lead change)";
+
+    return { t: x.t, text: `${x.side}: ${desc} (${x.a}-${x.b})` };
+  });
+}
+
+/*
 function starFromBox(box: BoxPlayerLine[], rand: () => number) {
   const ranked = [...box]
     .map((l) => ({
@@ -683,7 +763,9 @@ function starFromBox(box: BoxPlayerLine[], rand: () => number) {
   const idx = Math.floor(rand() * Math.min(2, ranked.length));
   return ranked[idx]?.l ?? ranked[0]?.l;
 }
+*/
 
+/*
 function lastPossessions(
   aName: string,
   bName: string,
@@ -853,6 +935,7 @@ function lastPossessions(
 
   return lines;
 }
+*/
 
 function addBox(a: BoxPlayerLine[], b: BoxPlayerLine[]) {
   // Same slot order (PG..C). Just add each stat line.
@@ -961,7 +1044,7 @@ export function simulateMatch(opts: {
   let bBox = buildBox(opts.b.lineup, bScore, rand);
 
   let overtime: MatchRecap["overtime"] | undefined;
-  let lp = lastPossessions(opts.a.name, opts.b.name, aScore, bScore, aBox, bBox, rand);
+  let lp = lastPossessionsFromLog({ log: sim.log, aBox, bBox, rand });
 
   const debug: NonNullable<MatchRecap["debug"]> = {
     pace,
