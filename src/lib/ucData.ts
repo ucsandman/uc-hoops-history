@@ -43,6 +43,24 @@ export const seasons = seasonsRaw as Season[];
 export const playerSeasons = playersRaw as PlayerSeason[];
 export const eras = erasRaw as Era[];
 
+export type Scope = "all" | "since1987" | "last15";
+
+export function scopeFromQuery(v?: string | null): Scope {
+  return v === "since1987" ? "since1987" : v === "last15" ? "last15" : "all";
+}
+
+export function minYearForScope(scope: Scope): number | null {
+  if (scope === "since1987") return 1987;
+  if (scope === "last15") return new Date().getFullYear() - 15;
+  return null;
+}
+
+export function filterByScope<T extends { year: number }>(rows: T[], scope: Scope): T[] {
+  const min = minYearForScope(scope);
+  if (min == null) return rows;
+  return rows.filter((r) => r.year >= min);
+}
+
 export function coachForYear(year: number): string {
   const s = seasons.find((x) => x.year === year);
   if (!s?.coach) return "Unknown";

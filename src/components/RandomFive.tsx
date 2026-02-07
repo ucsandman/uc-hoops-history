@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { coachForYear, eraForCoach, filterActuallyPlayed, playerSeasons } from "@/lib/ucData";
+import { coachForYear, eraForCoach, filterActuallyPlayed, filterByScope, playerSeasons, scopeFromQuery, type Scope } from "@/lib/ucData";
 import type { Lineup } from "@/lib/sim";
 
 type Row = (typeof playerSeasons)[number];
@@ -54,16 +54,18 @@ export default function RandomFive() {
   const seed = Number.parseInt(seedStr.slice(0, 10), 10) || 0;
   const rand = useMemo(() => mulberry32(seed || 1), [seed]);
 
+  const scope: Scope = scopeFromQuery(params.get("scope"));
+
   useEffect(() => {
     if (!params.get("s")) {
-      router.replace(`/random?s=${new Date().getTime()}`);
+      router.replace(`/random?s=${new Date().getTime()}&scope=${scope}`);
     }
-  }, [params, router]);
+  }, [params, router, scope]);
 
-  const played = useMemo(
-    () => filterActuallyPlayed(playerSeasons, { minGames: 10, minMinutes: 10 }),
-    []
-  );
+  const played = useMemo(() => {
+    const base = filterActuallyPlayed(playerSeasons, { minGames: 10, minMinutes: 10 });
+    return filterByScope(base, scope);
+  }, [scope]);
 
   const chosen = useMemo(() => {
     const taken = new Set<string>();
@@ -145,6 +147,24 @@ export default function RandomFive() {
         </p>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex flex-wrap gap-2">
+            {([
+              { id: "all", label: "All-time" },
+              { id: "since1987", label: "Since 1987" },
+              { id: "last15", label: "Last 15 years" },
+            ] as const).map((s) => (
+              <button
+                key={s.id}
+                onClick={() => router.replace(`/random?s=${seed || new Date().getTime()}&scope=${s.id}`)}
+                className={
+                  "sb-chip rounded-xl px-3 py-2 text-sm font-semibold transition-colors " +
+                  (scope === s.id ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                }
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
           <button
             onClick={() => router.replace(`/random?s=${new Date().getTime()}`)}
             className="rounded-xl bg-red-500/90 px-3 py-2 text-sm font-semibold text-black hover:bg-red-400 transition-colors"

@@ -8,6 +8,7 @@ type Row = {
   id: string;
   name: string;
   mode: "top" | "sicko";
+  scope: "all" | "since1987" | "last15";
   updated_at: string;
   wins: number;
   losses: number;
@@ -40,7 +41,7 @@ export default async function MePage() {
   const pool = db();
   const res = await pool.query<Row>(
     `
-    SELECT d.id, d.name, d.mode, d.updated_at, r.wins, r.losses, r.elo
+    SELECT d.id, d.name, d.mode, d.scope, d.updated_at, r.wins, r.losses, r.elo
     FROM drafts d
     JOIN ratings r ON r.draft_id = d.id
     WHERE d.user_id = $1
@@ -75,6 +76,7 @@ export default async function MePage() {
               <tr className="text-left">
                 <th className="py-2 pr-2">Draft</th>
                 <th className="py-2 pr-2">Mode</th>
+                <th className="py-2 pr-2">Scope</th>
                 <th className="py-2 pr-2">Elo</th>
                 <th className="py-2 pr-2">W</th>
                 <th className="py-2 pr-2">L</th>
@@ -89,6 +91,9 @@ export default async function MePage() {
                     </a>
                   </td>
                   <td className="py-2 pr-2 text-zinc-200">{r.mode === "sicko" ? "Sicko" : "Top 5"}</td>
+                  <td className="py-2 pr-2 text-zinc-200">
+                    {r.scope === "last15" ? "Last 15" : r.scope === "since1987" ? "Since 1987" : "All"}
+                  </td>
                   <td className="py-2 pr-2 font-black text-zinc-100">{r.elo}</td>
                   <td className="py-2 pr-2 text-zinc-200">{r.wins}</td>
                   <td className="py-2 pr-2 text-zinc-200">{r.losses}</td>
@@ -96,7 +101,7 @@ export default async function MePage() {
               ))}
               {!res.rows.length ? (
                 <tr>
-                  <td colSpan={5} className="py-6 text-sm text-zinc-400">
+                  <td colSpan={6} className="py-6 text-sm text-zinc-400">
                     No drafts yet. Make one.
                   </td>
                 </tr>

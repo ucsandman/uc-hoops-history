@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { eras, filterActuallyPlayed, playerSeasons } from "@/lib/ucData";
+import { eras, filterActuallyPlayed, filterByScope, playerSeasons, scopeFromQuery, type Scope } from "@/lib/ucData";
 
 type Row = (typeof playerSeasons)[number];
 
@@ -129,10 +129,15 @@ function fuzzyMatch(name: string, q: string) {
 }
 
 export default function DraftBoard() {
-  const played = useMemo(() => filterActuallyPlayed(playerSeasons, { minGames: 10, minMinutes: 10 }), []);
+  const sp = useSearchParams();
+  const [scope, setScope] = useState<Scope>("all");
+
+  const played = useMemo(() => {
+    const base = filterActuallyPlayed(playerSeasons, { minGames: 10, minMinutes: 10 });
+    return filterByScope(base, scope);
+  }, [scope]);
 
   const router = useRouter();
-  const sp = useSearchParams();
 
   const [query, setQuery] = useState("");
   const [era, setEra] = useState<string>("all");
@@ -171,17 +176,20 @@ export default function DraftBoard() {
     try {
       const eraQ = sp.get("era");
       const sortQ = sp.get("sort");
+      const scopeQ = sp.get("scope");
       if (eraQ && (eraQ === "all" || eras.some((e) => e.id === eraQ))) setEra(eraQ);
       if (sortQ && ["ppg", "mpg", "games", "alpha"].includes(sortQ)) setSortBy(sortQ as typeof sortBy);
+      setScope(scopeFromQuery(scopeQ));
     } catch {
       // ignore
     }
 
     // Local prefs fallback
     try {
-      const saved = JSON.parse(localStorage.getItem("uc_draft_controls") ?? "null") as null | { era?: string; sort?: string };
+      const saved = JSON.parse(localStorage.getItem("uc_draft_controls") ?? "null") as null | { era?: string; sort?: string; scope?: Scope };
       if (saved?.era && !sp.get("era") && (saved.era === "all" || eras.some((e) => e.id === saved.era))) setEra(saved.era);
       if (saved?.sort && !sp.get("sort") && ["ppg", "mpg", "games", "alpha"].includes(saved.sort)) setSortBy(saved.sort as typeof sortBy);
+      if (saved?.scope && !sp.get("scope")) setScope(saved.scope);
     } catch {
       // ignore
     }
@@ -217,7 +225,7 @@ export default function DraftBoard() {
   // Persist controls to URL + localStorage so links are shareable.
   useEffect(() => {
     try {
-      localStorage.setItem("uc_draft_controls", JSON.stringify({ era, sort: sortBy }));
+      localStorage.setItem("uc_draft_controls", JSON.stringify({ era, sort: sortBy, scope }));
     } catch {
       // ignore
     }
@@ -228,9 +236,15 @@ export default function DraftBoard() {
     else url.searchParams.delete("era");
     if (sortBy && sortBy !== "ppg") url.searchParams.set("sort", sortBy);
     else url.searchParams.delete("sort");
+    if (scope && scope !== "all") url.searchParams.set("scope", scope);
+    else url.searchParams.delete("scope");
+
+    // Changing scope can make the current share-encoded lineup invalid.
+    // Drop encoded lineup state when scope changes.
+    url.searchParams.delete("s");
 
     router.replace(url.pathname + url.search);
-  }, [era, sortBy, router]);
+  }, [era, sortBy, scope, router]);
 
   const statsByPlayer = useMemo(() => {
     const eraObj = eras.find((e) => e.id === era) ?? null;
@@ -640,6 +654,26 @@ export default function DraftBoard() {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {([
+              { id: "all", label: "All-time" },
+              { id: "since1987", label: "Since 1987" },
+              { id: "last15", label: "Last 15 years" },
+            ] as const).map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setScope(s.id)}
+                className={
+                  "sb-chip rounded-xl px-3 py-2 text-xs font-semibold transition-colors " +
+                  (scope === s.id ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                }
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
               <div>

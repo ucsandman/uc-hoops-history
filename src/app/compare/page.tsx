@@ -1,4 +1,4 @@
-import { playerSeasons, seasons, coachForYear, eraForCoach, filterActuallyPlayed } from "@/lib/ucData";
+import { filterByScope, playerSeasons, scopeFromQuery, seasons, coachForYear, eraForCoach, filterActuallyPlayed, type Scope } from "@/lib/ucData";
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
@@ -48,8 +48,8 @@ function EraList({ title, rows }: { title: string; rows: EraPick[] }) {
   );
 }
 
-function TopBottom({ era }: { era: "Cronin" | "Brannen" | "Miller" }) {
-  const played = filterActuallyPlayed(playerSeasons, { minGames: 10, minMinutes: 10 });
+function TopBottom({ era, scope }: { era: "Cronin" | "Brannen" | "Miller"; scope: Scope }) {
+  const played = filterActuallyPlayed(filterByScope(playerSeasons, scope), { minGames: 10, minMinutes: 10 });
 
   const rows = played
     .filter((r) => eraForCoach(coachForYear(r.year)) === era)
@@ -85,8 +85,15 @@ function TopBottom({ era }: { era: "Cronin" | "Brannen" | "Miller" }) {
   );
 }
 
-export default function ComparePage() {
-  const seasonsAll = [...seasons].sort((a, b) => a.year - b.year);
+export default async function ComparePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ scope?: string }>;
+}) {
+  const sp = await searchParams;
+  const scope: Scope = scopeFromQuery(sp.scope);
+
+  const seasonsAll = [...filterByScope(seasons, scope)].sort((a, b) => a.year - b.year);
 
   const byCoach = new Map<string, typeof seasonsAll>();
   for (const s of seasonsAll) {
@@ -132,11 +139,29 @@ export default function ComparePage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-black tracking-tight">Compare coaches (all-time)</h1>
+        <h1 className="text-2xl font-black tracking-tight">Compare coaches</h1>
         <p className="mt-2 text-sm text-zinc-300 max-w-2xl">
-          Coach comparison from season-level data across our full dataset. This is still quick-and-dirty,
-          but it now includes every coach we have seasons for.
+          Coach comparison from season-level data. Use the scope toggle to focus on modern eras.
         </p>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {([
+            { id: "all", label: "All-time" },
+            { id: "since1987", label: "Since 1987" },
+            { id: "last15", label: "Last 15 years" },
+          ] as const).map((s) => (
+            <a
+              key={s.id}
+              href={`/compare?scope=${s.id}`}
+              className={
+                "sb-chip rounded-xl px-3 py-2 text-sm font-semibold transition-colors " +
+                (scope === s.id ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+              }
+            >
+              {s.label}
+            </a>
+          ))}
+        </div>
       </header>
 
       <section className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -191,9 +216,9 @@ export default function ComparePage() {
       </section>
 
       <div className="pt-4" />
-      <TopBottom era="Cronin" />
-      <TopBottom era="Brannen" />
-      <TopBottom era="Miller" />
+      <TopBottom era="Cronin" scope={scope} />
+      <TopBottom era="Brannen" scope={scope} />
+      <TopBottom era="Miller" scope={scope} />
     </div>
   );
 }

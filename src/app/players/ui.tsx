@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { coachForYear, eras, playerSeasons } from "@/lib/ucData";
+import { coachForYear, eras, filterByScope, playerSeasons, scopeFromQuery, type Scope } from "@/lib/ucData";
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
@@ -28,6 +28,7 @@ export default function PlayersClient() {
 
   const [q, setQ] = useState("");
   const [era, setEra] = useState<string>("all");
+  const [scope, setScope] = useState<Scope>("all");
   const [minG, setMinG] = useState(10);
   const [minMPG, setMinMPG] = useState(10);
   const [minPPG, setMinPPG] = useState(0);
@@ -43,8 +44,15 @@ export default function PlayersClient() {
     }
 
     try {
-      const saved = JSON.parse(localStorage.getItem("uc_players_controls") ?? "null") as null | { era?: string };
+      setScope(scopeFromQuery(sp.get("scope")));
+    } catch {
+      // ignore
+    }
+
+    try {
+      const saved = JSON.parse(localStorage.getItem("uc_players_controls") ?? "null") as null | { era?: string; scope?: Scope };
       if (saved?.era && !sp.get("era") && (saved.era === "all" || eras.some((e) => e.id === saved.era))) setEra(saved.era);
+      if (saved?.scope && !sp.get("scope")) setScope(saved.scope);
     } catch {
       // ignore
     }
@@ -53,7 +61,7 @@ export default function PlayersClient() {
 
   useEffect(() => {
     try {
-      localStorage.setItem("uc_players_controls", JSON.stringify({ era }));
+      localStorage.setItem("uc_players_controls", JSON.stringify({ era, scope }));
     } catch {
       // ignore
     }
@@ -61,14 +69,18 @@ export default function PlayersClient() {
     const url = new URL(window.location.href);
     if (era && era !== "all") url.searchParams.set("era", era);
     else url.searchParams.delete("era");
+    if (scope && scope !== "all") url.searchParams.set("scope", scope);
+    else url.searchParams.delete("scope");
     router.replace(url.pathname + url.search);
-  }, [era, router]);
+  }, [era, scope, router]);
 
   const filteredRows = useMemo(() => {
     const query = q.trim().toLowerCase();
     const eraObj = eras.find((e) => e.id === era) ?? null;
 
-    return playerSeasons.filter((r) => {
+    const scoped = filterByScope(playerSeasons, scope);
+
+    return scoped.filter((r) => {
       if (era !== "all" && eraObj) {
         if (r.year < eraObj.from || r.year > eraObj.to) return false;
       }
@@ -80,7 +92,7 @@ export default function PlayersClient() {
       if (!query) return true;
       return r.player.toLowerCase().includes(query);
     });
-  }, [q, era, minG, minMPG, minPPG, minRPG, minAPG]);
+  }, [q, era, scope, minG, minMPG, minPPG, minRPG, minAPG]);
 
   const [sortBy, setSortBy] = useState<"name" | "ppg" | "rpg" | "apg" | "mpg" | "games">("name");
 
@@ -140,6 +152,25 @@ export default function PlayersClient() {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {([
+              { id: "all", label: "All-time" },
+              { id: "since1987", label: "Since 1987" },
+              { id: "last15", label: "Last 15 years" },
+            ] as const).map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setScope(s.id)}
+                className={
+                  "sb-chip rounded-xl px-3 py-2 text-xs font-semibold transition-colors " +
+                  (scope === s.id ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                }
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
             <div className="lg:col-span-2">
               <div className="text-xs text-zinc-400">Search</div>
