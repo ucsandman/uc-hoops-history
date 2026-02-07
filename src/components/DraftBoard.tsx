@@ -837,55 +837,143 @@ export default function DraftBoard() {
                   placeholder="Search players (fuzzy)"
                   className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm outline-none focus:border-white/20"
                 />
-                <select
-                  value={era}
-                  onChange={(e) => {
-                    setEra(e.target.value);
-                    setRosterLimit(80);
-                  }}
-                  className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm outline-none focus:border-white/20"
-                >
-                  <option value="all">All</option>
-                  {(() => {
-                    const groups = new Map<string, typeof eras>();
-                    for (const er of eras) {
-                      const g = er.group ?? "Other";
-                      const arr = groups.get(g) ?? [];
-                      arr.push(er);
-                      groups.set(g, arr);
-                    }
+                {(() => {
+                  // Custom dropdown instead of native <select>.
+                  // Native select popups can open "up" and anchor around the selected item.
+                  // This keeps the menu opening downward, within the viewport, and starts scrolled to the top.
 
-                    const order = ["Default", "Decade", "Conference", "Coach", "Other"];
-                    const keys = Array.from(groups.keys()).sort((a, b) => {
-                      const ai = order.indexOf(a);
-                      const bi = order.indexOf(b);
-                      if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-                      return a.localeCompare(b);
-                    });
+                  const EraDropdown = () => {
+                    const [open, setOpen] = useState(false);
+                    const btnRef = useRef<HTMLButtonElement | null>(null);
+                    const menuRef = useRef<HTMLDivElement | null>(null);
 
-                    const sortForGroup = (k: string) => {
-                      // Make the dropdown start with the most recent eras first.
-                      if (k === "Coach" || k === "Conference" || k === "Decade") {
-                        return (a: (typeof eras)[number], b: (typeof eras)[number]) => b.from - a.from;
+                    const label =
+                      era === "all" ? "All" : eras.find((e) => e.id === era)?.label ?? "All";
+
+                    const groups = useMemo(() => {
+                      const m = new Map<string, typeof eras>();
+                      for (const er of eras) {
+                        const g = er.group ?? "Other";
+                        const arr = m.get(g) ?? [];
+                        arr.push(er);
+                        m.set(g, arr);
                       }
-                      return (a: (typeof eras)[number], b: (typeof eras)[number]) => a.from - b.from;
-                    };
 
-                    return keys.map((k) => (
-                      <optgroup key={k} label={k}>
-                        {groups
-                          .get(k)!
-                          .slice()
-                          .sort(sortForGroup(k))
-                          .map((er) => (
-                            <option key={er.id} value={er.id}>
-                              {er.label}
-                            </option>
-                          ))}
-                      </optgroup>
-                    ));
-                  })()}
-                </select>
+                      const order = ["Default", "Decade", "Conference", "Coach", "Other"];
+                      const keys = Array.from(m.keys()).sort((a, b) => {
+                        const ai = order.indexOf(a);
+                        const bi = order.indexOf(b);
+                        if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+                        return a.localeCompare(b);
+                      });
+
+                      const sortForGroup = (k: string) => {
+                        if (k === "Coach" || k === "Conference" || k === "Decade") {
+                          return (a: (typeof eras)[number], b: (typeof eras)[number]) => b.from - a.from;
+                        }
+                        return (a: (typeof eras)[number], b: (typeof eras)[number]) => a.from - b.from;
+                      };
+
+                      return keys.map((k) => ({
+                        key: k,
+                        items: (m.get(k) ?? []).slice().sort(sortForGroup(k)),
+                      }));
+                    }, []);
+
+                    useEffect(() => {
+                      if (!open) return;
+
+                      const onDown = (e: MouseEvent) => {
+                        const t = e.target as Node | null;
+                        if (!t) return;
+                        if (btnRef.current?.contains(t)) return;
+                        if (menuRef.current?.contains(t)) return;
+                        setOpen(false);
+                      };
+
+                      window.addEventListener("mousedown", onDown);
+                      return () => window.removeEventListener("mousedown", onDown);
+                    }, [open]);
+
+                    useEffect(() => {
+                      if (open) {
+                        // Always open scrolled to the top so the user sees modern filters first.
+                        if (menuRef.current) menuRef.current.scrollTop = 0;
+                      }
+                    }, [open]);
+
+                    return (
+                      <div className="relative">
+                        <button
+                          ref={btnRef}
+                          type="button"
+                          onClick={() => setOpen((v) => !v)}
+                          className="inline-flex min-w-[240px] items-center justify-between gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-white/20"
+                          aria-haspopup="listbox"
+                          aria-expanded={open}
+                        >
+                          <span className="truncate">{label}</span>
+                          <span className="text-zinc-400">▾</span>
+                        </button>
+
+                        {open ? (
+                          <div
+                            ref={menuRef}
+                            className="absolute left-0 top-full z-50 mt-2 w-[360px] max-w-[80vw] overflow-auto rounded-2xl border border-white/10 bg-[rgba(10,10,14,0.98)] p-2 shadow-2xl backdrop-blur"
+                            style={{ maxHeight: "min(60vh, 520px)" }}
+                            role="listbox"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEra("all");
+                                setRosterLimit(80);
+                                setOpen(false);
+                              }}
+                              className={
+                                "w-full rounded-xl px-3 py-2 text-left text-sm font-semibold transition-colors " +
+                                (era === "all" ? "bg-white text-black" : "text-zinc-200 hover:bg-white/5")
+                              }
+                            >
+                              All
+                            </button>
+
+                            {groups.map((g) => (
+                              <div key={g.key} className="mt-2">
+                                <div className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black uppercase tracking-wide text-zinc-200">
+                                  {g.key}
+                                </div>
+                                <div className="mt-1">
+                                  {g.items.map((er) => (
+                                    <button
+                                      key={er.id}
+                                      type="button"
+                                      onClick={() => {
+                                        setEra(er.id);
+                                        setRosterLimit(80);
+                                        setOpen(false);
+                                      }}
+                                      className={
+                                        "w-full rounded-xl px-3 py-2 text-left text-sm font-semibold transition-colors " +
+                                        (era === er.id
+                                          ? "bg-white text-black"
+                                          : "text-zinc-200 hover:bg-white/5")
+                                      }
+                                    >
+                                      {er.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  };
+
+                  return <EraDropdown />;
+                })()}
 
                 <select
                   value={sortBy}
