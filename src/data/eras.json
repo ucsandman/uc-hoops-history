@@ -1,24 +1,163 @@
 [
   {
-    "id": "modern",
-    "label": "Modern (2012–Now)",
-    "from": 2012,
-    "to": 2100,
-    "group": "Default"
-  },
-
-  {
-    "id": "conf-big12",
-    "label": "Big 12 Era (2023–Now)",
-    "from": 2023,
-    "to": 2100,
-    "group": "Conference"
+    "id": "coach-anthony-chez-1902",
+    "label": "Anthony Chez Era (1902–1903)",
+    "from": 1902,
+    "to": 1903,
+    "group": "Coach"
   },
   {
-    "id": "conf-aac",
-    "label": "AAC Era (2013–2023)",
-    "from": 2013,
-    "to": 2023,
+    "id": "coach-amos-foster-1904",
+    "label": "Amos Foster Era (1904–1908)",
+    "from": 1904,
+    "to": 1908,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-russ-easton-1910",
+    "label": "Russ Easton Era (1910–1913)",
+    "from": 1910,
+    "to": 1913,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-george-little-1914",
+    "label": "George Little Era (1914–1915)",
+    "from": 1914,
+    "to": 1915,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-boyd-chambers-1918",
+    "label": "Boyd Chambers Era (1918–1927)",
+    "from": 1918,
+    "to": 1927,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-frank-rice-1928",
+    "label": "Frank Rice Era (1928–1931)",
+    "from": 1928,
+    "to": 1931,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-tay-brown-1933",
+    "label": "Tay Brown Era (1933–1936)",
+    "from": 1933,
+    "to": 1936,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-rip-van-winkle-1937",
+    "label": "Rip Van Winkle Era (1937–1938)",
+    "from": 1937,
+    "to": 1938,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-clark-ballard-1939",
+    "label": "Clark Ballard Era (1939–1941)",
+    "from": 1939,
+    "to": 1941,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-bob-ruess-1942",
+    "label": "Bob Ruess Era (1942–1943)",
+    "from": 1942,
+    "to": 1943,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-ray-farnham-1944",
+    "label": "Ray Farnham Era (1944–1945)",
+    "from": 1944,
+    "to": 1945,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-john-wiethe-1946",
+    "label": "John Wiethe Era (1946–1951)",
+    "from": 1946,
+    "to": 1951,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-george-smith-1952",
+    "label": "George Smith Era (1952–1959)",
+    "from": 1952,
+    "to": 1959,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-ed-jucker-1960",
+    "label": "Ed Jucker Era (1960–1964)",
+    "from": 1960,
+    "to": 1964,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-tay-baker-1965",
+    "label": "Tay Baker Era (1965–1971)",
+    "from": 1965,
+    "to": 1971,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-gale-catlett-1972",
+    "label": "Gale Catlett Era (1972–1977)",
+    "from": 1972,
+    "to": 1977,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-ed-badger-1978",
+    "label": "Ed Badger Era (1978–1982)",
+    "from": 1978,
+    "to": 1982,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-tony-yates-1983",
+    "label": "Tony Yates Era (1983–1988)",
+    "from": 1983,
+    "to": 1988,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-bob-huggins-1989",
+    "label": "Bob Huggins Era (1989–2004)",
+    "from": 1989,
+    "to": 2004,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-mick-cronin-2006",
+    "label": "Mick Cronin Era (2006–2018)",
+    "from": 2006,
+    "to": 2018,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-john-brannen-2019",
+    "label": "John Brannen Era (2019–2020)",
+    "from": 2019,
+    "to": 2020,
+    "group": "Coach"
+  },
+  {
+    "id": "coach-wes-miller-2021",
+    "label": "Wes Miller Era (2021–2025)",
+    "from": 2021,
+    "to": 2025,
+    "group": "Coach"
+  },
+  {
+    "id": "conf-cusa",
+    "label": "C-USA Era (1995–2005)",
+    "from": 1995,
+    "to": 2005,
     "group": "Conference"
   },
   {
@@ -29,42 +168,19 @@
     "group": "Conference"
   },
   {
-    "id": "conf-cusa",
-    "label": "C-USA Era (1995–2005)",
-    "from": 1995,
-    "to": 2005,
+    "id": "conf-aac",
+    "label": "AAC Era (2013–2023)",
+    "from": 2013,
+    "to": 2023,
     "group": "Conference"
   },
-
   {
-    "id": "coach-miller",
-    "label": "Wes Miller Era (2021–Now)",
-    "from": 2021,
+    "id": "conf-big12",
+    "label": "Big 12 Era (2023–Now)",
+    "from": 2023,
     "to": 2100,
-    "group": "Coach"
+    "group": "Conference"
   },
-  {
-    "id": "coach-brannen",
-    "label": "John Brannen Era (2019–2021)",
-    "from": 2019,
-    "to": 2021,
-    "group": "Coach"
-  },
-  {
-    "id": "coach-cronin",
-    "label": "Mick Cronin Era (2006–2019)",
-    "from": 2006,
-    "to": 2019,
-    "group": "Coach"
-  },
-  {
-    "id": "coach-huggins",
-    "label": "Bob Huggins Era (1989–2005)",
-    "from": 1989,
-    "to": 2005,
-    "group": "Coach"
-  },
-
   {
     "id": "decade-1960s",
     "label": "1960s",
@@ -113,5 +229,12 @@
     "from": 2020,
     "to": 2029,
     "group": "Decade"
+  },
+  {
+    "id": "modern",
+    "label": "Modern (2012–Now)",
+    "from": 2012,
+    "to": 2100,
+    "group": "Default"
   }
 ]
