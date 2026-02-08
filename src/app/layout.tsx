@@ -58,32 +58,32 @@ export default function RootLayout({
                   <div>
                     <Link
                       href="/"
-                      className="tracking-[0.08em] text-[22px] leading-none sm:text-[26px] [font-family:var(--font-display)] uppercase text-[var(--scoreboard-amber)] [text-shadow:0_0_10px_var(--led-glow),0_2px_4px_rgba(0,0,0,0.8)]"
+                      className="tracking-[0.08em] text-[26px] leading-none sm:text-[32px] [font-family:var(--font-display)] uppercase text-[var(--scoreboard-amber)] [text-shadow:0_0_10px_var(--led-glow),0_2px_4px_rgba(0,0,0,0.8)]"
                     >
                       UC Hoops History
                     </Link>
-                    <div className="mt-1 text-[13px] text-[var(--muted-cream)] sm:text-[14px] tracking-wide">Draft · Sim · Talk Trash</div>
+                    <div className="mt-1 text-[16px] text-[var(--muted-cream)] sm:text-[18px] tracking-wide">Draft · Sim · Talk Trash</div>
                   </div>
                 </div>
 
-                <nav className="-mx-1 flex w-full items-center gap-2 overflow-x-auto px-1 pb-1 text-[15px] [scrollbar-width:none] sm:mx-0 sm:w-auto sm:gap-2.5 sm:overflow-visible sm:px-0 sm:pb-0 sm:text-[16px]">
+                <nav className="-mx-1 flex w-full items-center gap-2 overflow-x-auto px-1 pb-1 text-[17px] [scrollbar-width:none] sm:mx-0 sm:w-auto sm:gap-2.5 sm:overflow-visible sm:px-0 sm:pb-0 sm:text-[19px]">
                   <style>{"nav::-webkit-scrollbar{display:none}"}</style>
-                  <Link className="sb-chip rounded px-3.5 py-2 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/players">
+                  <Link className="sb-chip rounded px-4 py-2.5 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/players">
                     Players
                   </Link>
-                  <Link className="sb-chip rounded px-3.5 py-2 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/draft">
+                  <Link className="sb-chip rounded px-4 py-2.5 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/draft">
                     Draft
                   </Link>
-                  <Link className="sb-chip rounded px-3.5 py-2 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/compare">
+                  <Link className="sb-chip rounded px-4 py-2.5 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/compare">
                     Compare
                   </Link>
-                  <Link className="sb-chip rounded px-3.5 py-2 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/leaderboard">
+                  <Link className="sb-chip rounded px-4 py-2.5 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/leaderboard">
                     Leaders
                   </Link>
-                  <Link className="sb-chip rounded px-3.5 py-2 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/me">
+                  <Link className="sb-chip rounded px-4 py-2.5 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/me">
                     My Drafts
                   </Link>
-                  <Link className="sb-chip rounded px-3.5 py-2 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/about">
+                  <Link className="sb-chip rounded px-4 py-2.5 text-[var(--vintage-cream)] hover:text-[var(--scoreboard-amber)] hover:shadow-[0_0_12px_var(--led-glow)] transition-all uppercase tracking-[0.05em]" href="/about">
                     About
                   </Link>
                 </nav>
@@ -91,11 +91,11 @@ export default function RootLayout({
             </header>
           </SmartHeader>
           <main className="mx-auto max-w-6xl px-3 pt-6 pb-[calc(2.5rem+env(safe-area-inset-bottom))] sm:px-4 sm:pt-10 sm:pb-10">{children}</main>
-          <footer className="mx-auto max-w-6xl px-4 pb-10 text-sm text-[var(--muted-cream)] tracking-wide border-t border-[var(--court-line)]/30 pt-8 mt-12">
+          <footer className="mx-auto max-w-6xl px-4 pb-10 text-base text-[var(--muted-cream)] tracking-wide border-t border-[var(--court-line)]/30 pt-8 mt-12">
             <div className="text-center">
               Sports-Reference data (scraped) • Unofficial fan project • Built for sharing
             </div>
-            <div className="text-center mt-2 text-xs text-[var(--court-line)] uppercase tracking-[0.1em]">
+            <div className="text-center mt-2 text-sm text-[var(--court-line)] uppercase tracking-[0.1em]">
               Est. Since the Oscar Robertson Era
             </div>
           </footer>
