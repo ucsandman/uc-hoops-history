@@ -1,4 +1,13 @@
-import { seasons, eraForCoach, coachForYear } from "@/lib/ucData";
+"use client";
+
+import { useState, useMemo } from "react";
+import { seasons, eras, coachForYear } from "@/lib/ucData";
+import { StatsCard } from "@/components/StatsCard";
+import { TimelineChart } from "@/components/TimelineChart";
+import { SeasonFilters } from "@/components/SeasonFilters";
+import { EraLegend } from "@/components/EraLegend";
+import { SeasonCard } from "@/components/SeasonCard";
+import type { Season } from "@/lib/ucData";
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
@@ -8,16 +17,85 @@ function Badge({ children }: { children: React.ReactNode }) {
   );
 }
 
+interface FilterState {
+  coach: string;
+  era: string;
+  tournamentOnly: boolean;
+  winningOnly: boolean;
+}
+
 export default function Home() {
-  const rows = [...seasons].sort((a, b) => b.year - a.year);
+  const [filters, setFilters] = useState<FilterState>({
+    coach: "all",
+    era: "all",
+    tournamentOnly: false,
+    winningOnly: false
+  });
+
+  // Get unique coaches for filter dropdown
+  const coaches = useMemo(() => {
+    const coachSet = new Set<string>();
+    seasons.forEach(s => {
+      coachSet.add(coachForYear(s.year));
+    });
+    return Array.from(coachSet).sort();
+  }, []);
+
+  // Get eras for filter (focusing on major coaching/conference eras)
+  const majorEras = useMemo(() => {
+    return eras
+      .filter(e => e.group === "Coach" || e.group === "Conference" || e.group === "Decade")
+      .sort((a, b) => a.from - b.from);
+  }, []);
+
+  // Filter seasons based on current filters
+  const filteredSeasons = useMemo(() => {
+    return seasons.filter(season => {
+      // Coach filter
+      if (filters.coach !== "all" && coachForYear(season.year) !== filters.coach) {
+        return false;
+      }
+
+      // Era filter
+      if (filters.era !== "all") {
+        const selectedEra = eras.find(e => e.id === filters.era);
+        if (selectedEra) {
+          if (season.year < selectedEra.from || season.year > selectedEra.to) {
+            return false;
+          }
+        }
+      }
+
+      // Tournament only filter
+      if (filters.tournamentOnly && !season.postseason?.includes("NCAA Tournament")) {
+        return false;
+      }
+
+      // Winning seasons only filter (>50% win rate)
+      if (filters.winningOnly) {
+        const totalGames = season.wins + season.losses;
+        const winPct = totalGames > 0 ? season.wins / totalGames : 0;
+        if (winPct <= 0.5) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [filters]);
+
+  const sortedSeasons = useMemo(() => {
+    return [...filteredSeasons].sort((a, b) => b.year - a.year);
+  }, [filteredSeasons]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      {/* Hero Section */}
       <section className="sb-card relative overflow-hidden rounded-2xl p-6">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-red-500/70 via-red-500/15 to-transparent" />
         <div className="relative">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge>UC Men’s Basketball</Badge>
+            <Badge>UC Men's Basketball</Badge>
             <Badge>Halftime Mode</Badge>
             <Badge>1901 → Now</Badge>
           </div>
@@ -50,9 +128,24 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Quick Stats Section */}
+      <StatsCard />
+
+      {/* Timeline Chart Section */}
+      <TimelineChart />
+
+      {/* Era Legend */}
+      <EraLegend />
+
+      {/* Filters and Seasons Section */}
       <section className="space-y-3">
         <div className="flex items-end justify-between gap-4">
-          <h2 className="text-lg font-bold tracking-tight">Timeline</h2>
+          <h2 className="text-lg font-bold tracking-tight">
+            Season Timeline 
+            <span className="ml-2 text-sm text-zinc-400 font-normal">
+              ({sortedSeasons.length} {sortedSeasons.length === 1 ? 'season' : 'seasons'})
+            </span>
+          </h2>
           <a
             href="/players"
             className="text-sm text-zinc-300 hover:text-white underline underline-offset-4"
@@ -61,63 +154,33 @@ export default function Home() {
           </a>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {rows.map((s) => {
-            const coachName = coachForYear(s.year);
-            const era = eraForCoach(coachName);
-            return (
-              <article
-                key={s.year}
-                className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/7 transition-colors"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-xs text-zinc-400">Season</div>
-                    <div className="text-xl font-black tracking-tight">{s.year}–{String(s.year + 1).slice(-2)}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-zinc-400">Record</div>
-                    <div className="text-lg font-bold">{s.record}</div>
-                  </div>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* Filters Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="lg:sticky lg:top-4">
+              <SeasonFilters 
+                coaches={coaches}
+                eras={majorEras}
+                onFilterChange={setFilters}
+              />
+            </div>
+          </div>
 
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Badge>{coachName}</Badge>
-                  <Badge>{era}</Badge>
-                  {s.conf ? <Badge>{s.conf}</Badge> : null}
-                  {s.postseason ? <Badge>{s.postseason}</Badge> : <Badge>No postseason</Badge>}
-                </div>
+          {/* Season Cards Grid */}
+          <div className="lg:col-span-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {sortedSeasons.map((s) => (
+                <SeasonCard key={s.year} season={s} />
+              ))}
+            </div>
 
-                <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-zinc-300">
-                  <div className="rounded-lg border border-white/10 bg-black/20 p-3">
-                    <div className="text-zinc-400">Conf</div>
-                    <div className="mt-1 font-semibold">
-                      {s.conf_wins != null && s.conf_losses != null
-                        ? `${s.conf_wins}-${s.conf_losses}`
-                        : "—"}
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-white/10 bg-black/20 p-3">
-                    <div className="text-zinc-400">SRS / SOS</div>
-                    <div className="mt-1 font-semibold">
-                      {s.srs != null ? s.srs.toFixed(2) : "—"} / {s.sos != null ? s.sos.toFixed(2) : "—"}
-                    </div>
-                  </div>
-                </div>
-
-                {s.season_url ? (
-                  <a
-                    className="mt-3 inline-block text-xs text-zinc-400 hover:text-white underline underline-offset-4"
-                    href={s.season_url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Source
-                  </a>
-                ) : null}
-              </article>
-            );
-          })}
+            {sortedSeasons.length === 0 && (
+              <div className="rounded-xl border border-white/10 bg-white/5 p-8 text-center">
+                <div className="text-zinc-400">No seasons match your filters.</div>
+                <div className="text-sm text-zinc-500 mt-1">Try adjusting your filter settings.</div>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </div>
