@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Teko:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -39,10 +39,10 @@ body {
 body {
   background: var(--arena-dark);
   color: var(--vintage-cream);
-  font-family: 'Teko', ui-sans-serif, system-ui, -apple-system, Segoe UI, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: 'Barlow', ui-sans-serif, system-ui, -apple-system, Segoe UI, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   font-weight: 500;
   font-size: 1.125rem;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -209,9 +209,9 @@ select {
   background: rgba(29, 15, 10, 0.8);
   border: 2px solid var(--court-line);
   color: var(--vintage-cream);
-  font-family: 'Teko', ui-sans-serif;
+  font-family: 'Barlow', ui-sans-serif;
   font-weight: 500;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   padding: 0.5rem 1rem;
 }
 

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Bebas_Neue, Teko } from "next/font/google";
+import { Bebas_Neue, Barlow } from "next/font/google";
 import SmartHeader from "@/components/SmartHeader";
 import "./globals.css";
 
-const bodyFont = Teko({
+const bodyFont = Barlow({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["400", "500", "600", "700"],
