@@ -224,3 +224,50 @@ select:focus {
   outline: none;
   box-shadow: 0 0 0 3px var(--led-glow);
 }
+
+/* Global font size overrides - make everything bigger for readability */
+.text-xs {
+  font-size: 0.875rem !important; /* 14px instead of 12px */
+  line-height: 1.25rem !important;
+}
+
+.text-sm {
+  font-size: 1.0625rem !important; /* 17px instead of 14px */
+  line-height: 1.5rem !important;
+}
+
+.text-base {
+  font-size: 1.25rem !important; /* 20px instead of 16px */
+  line-height: 1.75rem !important;
+}
+
+.text-lg {
+  font-size: 1.375rem !important; /* 22px instead of 18px */
+  line-height: 1.75rem !important;
+}
+
+.text-xl {
+  font-size: 1.5rem !important; /* 24px instead of 20px */
+  line-height: 1.75rem !important;
+}
+
+/* Specific pixel sizes that appear in the code */
+[class*="text-\[11px\]"] {
+  font-size: 0.8125rem !important; /* 13px instead of 11px */
+}
+
+[class*="text-\[12px\]"] {
+  font-size: 0.875rem !important; /* 14px instead of 12px */
+}
+
+[class*="text-\[13px\]"] {
+  font-size: 0.9375rem !important; /* 15px instead of 13px */
+}
+
+[class*="text-\[14px\]"] {
+  font-size: 1rem !important; /* 16px instead of 14px */
+}
+
+[class*="text-\[15px\]"] {
+  font-size: 1.0625rem !important; /* 17px instead of 15px */
+}
