@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Teko:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
 
 :root {
   /* Vintage Arena Palette - warm, nostalgic, pre-renovation Fifth Third vibes */
