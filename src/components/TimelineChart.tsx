@@ -67,17 +67,17 @@ export function TimelineChart() {
   };
 
   return (
-    <section className="sb-card relative overflow-hidden rounded-2xl p-6 border border-white/10 bg-white/5 min-h-[450px]">
+    <section className="sb-card relative overflow-hidden rounded-2xl p-6 border border-white/10 bg-white/5">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-red-500/70 via-red-500/15 to-transparent" />
       
-      <div className="relative min-h-[400px]">
+      <div className="relative">
         <div className="mb-6">
           <h2 className="text-2xl font-bold tracking-tight">Win % by Decade</h2>
           <p className="text-sm text-black mt-1 font-bold">UC Basketball performance across the decades</p>
         </div>
 
-        <div className="h-[300px] w-full min-h-[300px]">
-          <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height={300}>
             <BarChart data={decadeData} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
               <XAxis 
                 dataKey="decade" 
