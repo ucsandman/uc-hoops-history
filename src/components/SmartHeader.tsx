@@ -18,23 +18,14 @@ export default function SmartHeader({ children }: { children: React.ReactNode })
         const y = window.scrollY;
         const dy = y - lastY.current;
 
-        // Only apply on small screens. Desktop sticky is fine.
-        const isMobile = window.matchMedia("(max-width: 640px)").matches;
-        if (!isMobile) {
-          setHidden(false);
-          lastY.current = y;
-          ticking.current = false;
-          return;
-        }
-
         // Don't hide at very top.
-        if (y < 24) {
+        if (y < 50) {
           setHidden(false);
-        } else if (dy > 8) {
-          // scrolling down
+        } else if (dy > 12) {
+          // scrolling down - hide header
           setHidden(true);
-        } else if (dy < -6) {
-          // scrolling up
+        } else if (dy < -8) {
+          // scrolling up - show header
           setHidden(false);
         }
 
