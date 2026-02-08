@@ -73,7 +73,7 @@ export function TimelineChart() {
       <div className="relative min-h-[400px]">
         <div className="mb-6">
           <h2 className="text-2xl font-bold tracking-tight">Win % by Decade</h2>
-          <p className="text-sm text-[var(--vintage-cream)] mt-1 font-semibold">UC Basketball performance across the decades</p>
+          <p className="text-sm text-black mt-1 font-bold">UC Basketball performance across the decades</p>
         </div>
 
         <div className="h-[300px] w-full min-h-[300px]">
