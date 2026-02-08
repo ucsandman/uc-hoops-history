@@ -1,24 +1,32 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Teko:wght@400;500;600;700&display=swap');
 
 :root {
-  /* UC-ish palette */
-  --bg0: #07070a;
-  --bg1: #0b0b12;
-  --bg2: #121225;
-  --ink: #f4f4f7;
-  --muted: rgba(244, 244, 247, 0.68);
-
-  --uc-red: #e00122;
-  --uc-red2: #ff3b30;
-  --uc-gold: #facc15;
-
-  --ring: rgba(255, 255, 255, 0.12);
-  --ring2: rgba(255, 255, 255, 0.18);
+  /* Vintage Arena Palette - warm, nostalgic, pre-renovation Fifth Third vibes */
+  --arena-dark: #1a0f0a;
+  --arena-wood: #2d1810;
+  --arena-floor: #3d2418;
+  --court-line: #d4a574;
+  
+  --vintage-cream: #f5e6d3;
+  --scoreboard-amber: #ff9500;
+  --scoreboard-orange: #ff6b35;
+  --hot-light: #ffb627;
+  
+  --uc-vintage-red: #c41e3a;
+  --uc-faded-gold: #d4a574;
+  
+  --worn-white: rgba(245, 230, 211, 0.92);
+  --muted-cream: rgba(245, 230, 211, 0.65);
+  
+  /* Scoreboard effects */
+  --led-glow: rgba(255, 149, 0, 0.4);
+  --bulb-glow: rgba(255, 182, 39, 0.25);
 }
 
 @theme inline {
-  --color-background: var(--bg0);
-  --color-foreground: var(--ink);
+  --color-background: var(--arena-dark);
+  --color-foreground: var(--vintage-cream);
 }
 
 html,
@@ -27,38 +35,52 @@ body {
 }
 
 body {
-  background: var(--bg0);
-  color: var(--ink);
-  font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji",
-    "Segoe UI Emoji";
+  background: var(--arena-dark);
+  color: var(--vintage-cream);
+  font-family: 'Teko', ui-sans-serif, system-ui, -apple-system, Segoe UI, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-weight: 500;
+  letter-spacing: 0.02em;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
 .font-display {
-  font-family: var(--font-display), var(--font-body), ui-sans-serif, system-ui;
-  letter-spacing: -0.02em;
+  font-family: 'Bebas Neue', 'Teko', ui-sans-serif, system-ui;
+  letter-spacing: 0.03em;
+  font-weight: 400;
 }
 
-/* Clean arena-floor backdrop (subtle grid + vignette). No loud fades. */
+/* Vintage arena atmosphere - aged wood floor + warm overhead lights */
 body:before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.45;
   background-image:
-    /* faint grid */
-    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    /* subtle top vignette */
-    radial-gradient(900px circle at 50% -10%, rgba(255, 255, 255, 0.05), transparent 55%),
-    /* very faint UC red at the bottom edge */
-    radial-gradient(900px circle at 50% 120%, rgba(224, 1, 34, 0.06), transparent 60%);
-  background-size: 72px 72px, 72px 72px, auto, auto;
+    /* Overhead arena lights - warm spotlights from above */
+    radial-gradient(ellipse 800px 600px at 20% 0%, var(--bulb-glow), transparent 50%),
+    radial-gradient(ellipse 900px 700px at 80% 0%, rgba(255, 107, 53, 0.15), transparent 55%),
+    radial-gradient(ellipse 700px 500px at 50% 0%, var(--bulb-glow), transparent 60%),
+    /* Aged wood floor texture - subtle diagonal grain */
+    repeating-linear-gradient(
+      92deg,
+      transparent,
+      transparent 3px,
+      rgba(212, 165, 116, 0.02) 3px,
+      rgba(212, 165, 116, 0.02) 4px
+    ),
+    /* Base arena floor gradient - darker at edges like real court */
+    radial-gradient(ellipse 120% 100% at 50% 50%, var(--arena-floor), var(--arena-dark));
+  animation: subtle-flicker 8s ease-in-out infinite;
 }
 
-/* Subtle gritty grain (kept, but quieter) */
+/* Vintage scoreboard flicker effect (very subtle) */
+@keyframes subtle-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.96; }
+}
+
+/* Heavy film grain - worn VHS footage aesthetic */
 .grain {
   position: relative;
 }
@@ -67,36 +89,135 @@ body:before {
   pointer-events: none;
   position: absolute;
   inset: 0;
-  opacity: 0.05;
+  opacity: 0.12;
   mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.40'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");
+  animation: grain-shift 0.5s steps(6) infinite;
 }
 
-/* Cleaner "arena HUD" surfaces */
+@keyframes grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2%, -2%); }
+  30% { transform: translate(3%, 1%); }
+  50% { transform: translate(-1%, 3%); }
+  70% { transform: translate(2%, -1%); }
+  90% { transform: translate(-3%, 2%); }
+}
+
+/* Vintage scoreboard panels - LED display aesthetic */
 .sb-card {
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: rgba(12, 12, 18, 0.70);
+  position: relative;
+  border: 3px solid var(--court-line);
+  background: 
+    linear-gradient(180deg, 
+      rgba(45, 24, 16, 0.95) 0%, 
+      rgba(29, 15, 10, 0.98) 100%
+    );
   box-shadow:
-    0 16px 44px rgba(0, 0, 0, 0.44),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    /* Outer warm glow - arena lights reflecting */
+    0 0 40px rgba(255, 149, 0, 0.15),
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    /* Inner scoreboard LED backlight */
+    inset 0 0 60px rgba(255, 149, 0, 0.08),
+    inset 0 2px 0 rgba(212, 165, 116, 0.2),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.5);
 }
 
+.sb-card:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.15) 2px,
+      rgba(0, 0, 0, 0.15) 4px
+    );
+  opacity: 0.3;
+}
+
+/* Scoreboard chip - LED segment style */
 .sb-chip {
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(0, 0, 0, 0.18);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(212, 165, 116, 0.3);
+  background: rgba(29, 15, 10, 0.6);
+  box-shadow: 
+    inset 0 0 12px rgba(255, 149, 0, 0.1),
+    inset 0 1px 0 rgba(212, 165, 116, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.4);
+  font-family: 'Bebas Neue', monospace;
+  letter-spacing: 0.08em;
 }
 
-/* Native form controls (fix unreadable Windows select dropdowns) */
+/* LED number glow effect for stats */
+.led-glow {
+  color: var(--scoreboard-amber);
+  text-shadow: 
+    0 0 10px var(--led-glow),
+    0 0 20px var(--led-glow),
+    0 0 30px rgba(255, 149, 0, 0.2);
+  font-family: 'Bebas Neue', monospace;
+}
+
+/* Vintage button - chunky 80s scoreboard control style */
+.vintage-btn {
+  background: linear-gradient(180deg, var(--scoreboard-orange), var(--uc-vintage-red));
+  border: 3px solid var(--court-line);
+  box-shadow: 
+    0 4px 0 rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 107, 53, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
+  transition: all 0.15s ease;
+}
+
+.vintage-btn:hover {
+  transform: translateY(2px);
+  box-shadow: 
+    0 2px 0 rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(255, 107, 53, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.vintage-btn:active {
+  transform: translateY(4px);
+  box-shadow: 
+    0 0 0 rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(255, 107, 53, 0.6),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Court line accent */
+.court-line {
+  border-color: var(--court-line);
+}
+
+/* Native form controls */
 html {
   color-scheme: dark;
 }
 
 select {
-  color: rgba(244, 244, 247, 0.92);
+  background: rgba(29, 15, 10, 0.8);
+  border: 2px solid var(--court-line);
+  color: var(--vintage-cream);
+  font-family: 'Teko', ui-sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 1rem;
 }
 
 select option {
-  background: #0b0b12;
-  color: rgba(244, 244, 247, 0.95);
+  background: var(--arena-wood);
+  color: var(--vintage-cream);
+}
+
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--led-glow);
 }
